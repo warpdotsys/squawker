@@ -64,7 +64,7 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Symbols.info_outline),
+            leading: const Icon(Symbols.info),
             title: const Text('About'),
             subtitle: const Text('Download tweets using gallery-dl backend'),
           ),
