@@ -3,32 +3,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum DownloadState { idle, connecting, downloading, archiving, completed, error }
-
-class DownloadProgress {
-  final DownloadState state;
-  final String message;
-  final String? downloadUrl;
-
-  DownloadProgress({
-    required this.state,
-    required this.message,
-    this.downloadUrl,
-  });
-}
+enum DownloadState { idle, connecting, downloading, completed, error }
 
 class DownloadService {
   static const String _defaultApiBase = 'https://get.warpdotsys.com/download';
   static const String _prefApiEndpoint = 'download_api_endpoint';
-  static const String _prefArchiveMode = 'download_archive_mode';
+  static const String _prefTValue = 'download_t_value';
 
   static String _apiBase = _defaultApiBase;
-  static bool _archiveMode = true;
+  static int _tValue = 0;
 
   static Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _apiBase = prefs.getString(_prefApiEndpoint) ?? _defaultApiBase;
-    _archiveMode = prefs.getBool(_prefArchiveMode) ?? true;
+    _tValue = prefs.getInt(_prefTValue) ?? 0;
   }
 
   static Future<void> setApiEndpoint(String endpoint) async {
@@ -37,27 +25,39 @@ class DownloadService {
     await prefs.setString(_prefApiEndpoint, endpoint);
   }
 
-  static Future<void> setArchiveMode(bool archive) async {
-    _archiveMode = archive;
+  static Future<void> setTValue(int t) async {
+    _tValue = t;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_prefArchiveMode, archive);
+    await prefs.setInt(_prefTValue, t);
   }
 
   static String get apiEndpoint => _apiBase;
-  static bool get archiveMode => _archiveMode;
+  static int get tValue => _tValue;
 
-  Stream<DownloadProgress> downloadTweet(String tweetUrl) async* {
-    final uri = Uri.parse('$_apiBase?url=${Uri.encodeComponent(tweetUrl)}&archive=$_archiveMode');
+  static String getTValueLabel(int t) {
+    switch (t) {
+      case 0:
+        return 'Full Scan';
+      case 3:
+        return 'Fast (T=3)';
+      case 20:
+        return 'Safe (T=20)';
+      default:
+        return 'Custom (T=$t)';
+    }
+  }
 
-    yield DownloadProgress(state: DownloadState.connecting, message: 'Connecting to server...');
+  Stream<String> downloadTweet(String tweetUrl) async* {
+    var uri = '$_apiBase?url=${Uri.encodeComponent(tweetUrl)}';
+    if (_tValue > 0) {
+      uri += '&t=$_tValue';
+    }
 
     try {
-      final request = http.Request('GET', uri);
+      final request = http.Request('GET', Uri.parse(uri));
       final response = await http.Client().send(request);
 
       String buffer = '';
-      String lastMessage = '';
-      String? downloadUrl;
 
       await for (final chunk in response.stream.transform(utf8.decoder)) {
         buffer += chunk;
@@ -68,107 +68,21 @@ class DownloadService {
         for (final line in lines) {
           if (line.startsWith('data: ')) {
             final message = line.substring(6).trim();
-            if (message.isNotEmpty && message != lastMessage) {
-              lastMessage = message;
-
-              if (message.startsWith('http')) {
-                downloadUrl = message;
-                yield DownloadProgress(
-                  state: DownloadState.completed,
-                  message: 'Download ready!',
-                  downloadUrl: downloadUrl,
-                );
-                return;
-              }
-
-              if (message.contains('[System] Archiving')) {
-                yield DownloadProgress(
-                  state: DownloadState.archiving,
-                  message: 'Archiving files...',
-                );
-              } else if (message.contains('[System] Download finished')) {
-                yield DownloadProgress(
-                  state: DownloadState.completed,
-                  message: 'Download completed!',
-                );
-                return;
-              } else if (message.contains('Error') || message.contains('error')) {
-                yield DownloadProgress(
-                  state: DownloadState.error,
-                  message: message,
-                );
-                return;
-              } else {
-                yield DownloadProgress(
-                  state: DownloadState.downloading,
-                  message: message,
-                );
-              }
+            if (message.isNotEmpty) {
+              yield message;
             }
-          } else if (line.startsWith('event: archive')) {
-            yield DownloadProgress(
-              state: DownloadState.archiving,
-              message: 'Archiving files...',
-            );
-          } else if (line.startsWith('event: close')) {
-            if (downloadUrl != null) {
-              yield DownloadProgress(
-                state: DownloadState.completed,
-                message: 'Download ready!',
-                downloadUrl: downloadUrl,
-              );
-            } else {
-              yield DownloadProgress(
-                state: DownloadState.completed,
-                message: 'Task completed',
-              );
-            }
-            return;
           }
         }
       }
 
-      if (buffer.isNotEmpty) {
-        if (buffer.startsWith('data: ')) {
-          final content = buffer.substring(6).trim();
-          if (content.startsWith('http')) {
-            yield DownloadProgress(
-              state: DownloadState.completed,
-              message: 'Download ready!',
-              downloadUrl: content,
-            );
-            return;
-          }
+      if (buffer.isNotEmpty && buffer.startsWith('data: ')) {
+        final content = buffer.substring(6).trim();
+        if (content.isNotEmpty) {
+          yield content;
         }
-      }
-
-      if (downloadUrl != null) {
-        yield DownloadProgress(
-          state: DownloadState.completed,
-          message: 'Download ready!',
-          downloadUrl: downloadUrl,
-        );
-      } else {
-        yield DownloadProgress(
-          state: DownloadState.completed,
-          message: 'Task completed',
-        );
       }
     } catch (e) {
-      yield DownloadProgress(
-        state: DownloadState.error,
-        message: 'Download failed: $e',
-      );
+      throw Exception('Download failed: $e');
     }
-  }
-
-  static String extractTweetId(String url) {
-    final regex = RegExp(r'/status/(\d+)');
-    final match = regex.firstMatch(url);
-    return match?.group(1) ?? '';
-  }
-
-  static String buildTweetUrl(String username, String tweetId) {
-    return 'https://x.com/$username/status/$tweetId';
   }
 }

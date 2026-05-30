@@ -19,7 +19,7 @@ import 'package:squawker/user.dart';
 import 'package:squawker/utils/urls.dart';
 import 'package:squawker/utils/route_util.dart';
 import 'package:squawker/utils/text_util.dart';
-import 'package:squawker/download/download_progress_sheet.dart';
+import 'package:squawker/download/download_service.dart';
 import 'package:intl/intl.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:pref/pref.dart';
@@ -198,43 +198,37 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
 
   void _showBatchDownloadDialog(BuildContext context, String username) {
     final l10n = L10n.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.download_username_tweets(username)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.download_username_tweets_description(username)),
-            const SizedBox(height: 16),
-            Text(
-              l10n.download_large_account_warning,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              final url = 'https://x.com/$username';
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => DownloadProgressSheet(tweetUrl: url),
-              );
-            },
-            child: Text(l10n.start_download),
-          ),
-        ],
-      ),
+    final url = 'https://x.com/$username';
+    final scaffold = ScaffoldMessenger.of(context);
+
+    scaffold.showSnackBar(
+      SnackBar(content: Text(l10n.download_started)),
     );
+
+    () async {
+      try {
+        await for (final _ in DownloadService.downloadTweet(url)) {}
+        if (context.mounted) {
+          scaffold.clearSnackBars();
+          scaffold.showSnackBar(
+            SnackBar(
+              content: Text(l10n.download_completed),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          scaffold.clearSnackBars();
+          scaffold.showSnackBar(
+            SnackBar(
+              content: Text('${l10n.download_failed}: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }();
   }
 
   List<InlineSpan> _addLinksToText(BuildContext context, String content) {

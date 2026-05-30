@@ -28,7 +28,7 @@ import 'package:squawker/utils/route_util.dart';
 import 'package:squawker/utils/translation.dart';
 import 'package:squawker/utils/urls.dart';
 import 'package:squawker/download/download_button.dart';
-import 'package:squawker/download/download_progress_sheet.dart';
+import 'package:squawker/download/download_service.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -705,16 +705,38 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                                             thickness: 1.0,
                                           ),
                                         ),
-                                        createSheetButton(L10n.of(context).download_tweet, Symbols.download, () {
+                                        createSheetButton(L10n.of(context).download_tweet, Symbols.download, () async {
                                           Navigator.pop(context);
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                            builder: (_) => DownloadProgressSheet(
-                                              tweetUrl: 'https://x.com/${tweet.user!.screenName}/status/${tweet.idStr}',
-                                            ),
+                                          final url = 'https://x.com/${tweet.user!.screenName}/status/${tweet.idStr}';
+                                          final l10n = L10n.of(context);
+                                          final scaffold = ScaffoldMessenger.of(context);
+                                          
+                                          scaffold.showSnackBar(
+                                            SnackBar(content: Text(l10n.download_started)),
                                           );
+                                          
+                                          try {
+                                            await for (final _ in DownloadService.downloadTweet(url)) {}
+                                            if (context.mounted) {
+                                              scaffold.clearSnackBars();
+                                              scaffold.showSnackBar(
+                                                SnackBar(
+                                                  content: Text(l10n.download_completed),
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                              );
+                                            }
+                                          } catch (e) {
+                                            if (context.mounted) {
+                                              scaffold.clearSnackBars();
+                                              scaffold.showSnackBar(
+                                                SnackBar(
+                                                  content: Text('${l10n.download_failed}: $e'),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
+                                          }
                                         }),
                                         const Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 16),

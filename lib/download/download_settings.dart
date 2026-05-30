@@ -12,7 +12,7 @@ class DownloadSettingsPage extends StatefulWidget {
 }
 
 class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
-  bool _archiveMode = true;
+  int _tValue = 0;
   String _apiEndpoint = 'https://get.warpdotsys.com/download';
 
   @override
@@ -24,13 +24,13 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _archiveMode = prefs.getBool('download_archive_mode') ?? true;
+      _tValue = prefs.getInt('download_t_value') ?? 0;
       _apiEndpoint = prefs.getString('download_api_endpoint') ?? 'https://get.warpdotsys.com/download';
     });
   }
 
   Future<void> _saveSettings() async {
-    await DownloadService.setArchiveMode(_archiveMode);
+    await DownloadService.setTValue(_tValue);
     await DownloadService.setApiEndpoint(_apiEndpoint);
 
     if (mounted) {
@@ -50,14 +50,11 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
       ),
       body: ListView(
         children: [
-          SwitchListTile(
-            title: Text(l10n.archive_mode),
-            subtitle: Text(l10n.archive_mode_description),
-            value: _archiveMode,
-            onChanged: (v) {
-              setState(() => _archiveMode = v);
-              _saveSettings();
-            },
+          ListTile(
+            title: Text(l10n.download_mode),
+            subtitle: Text(DownloadService.getTValueLabel(_tValue)),
+            trailing: const Icon(Symbols.arrow_drop_down),
+            onTap: () => _showTValuePicker(context),
           ),
           ListTile(
             title: Text(l10n.api_server),
@@ -74,6 +71,40 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _showTValuePicker(BuildContext context) async {
+    final l10n = L10n.of(context);
+    final options = [
+      {'value': 0, 'label': l10n.download_mode_full_scan},
+      {'value': 3, 'label': l10n.download_mode_fast},
+      {'value': 20, 'label': l10n.download_mode_safe},
+    ];
+
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(l10n.download_mode),
+        children: options.map((opt) => SimpleDialogOption(
+          onPressed: () => Navigator.pop(ctx, opt['value'] as int),
+          child: Row(
+            children: [
+              if (_tValue == opt['value'])
+                Icon(Symbols.check, color: Theme.of(context).colorScheme.primary)
+              else
+                const SizedBox(width: 24),
+              const SizedBox(width: 12),
+              Text(opt['label'] as String),
+            ],
+          ),
+        )).toList(),
+      ),
+    );
+
+    if (result != null) {
+      setState(() => _tValue = result);
+      _saveSettings();
+    }
   }
 
   Future<void> _editApiEndpoint(BuildContext context) async {
