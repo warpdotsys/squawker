@@ -676,5 +676,45 @@
     "download_large_account_warning": "Note: This may take a while for accounts with many tweets.",
     "@download_large_account_warning": {},
     "start_download": "Start Download",
-    "@start_download": {}
+    "@start_download": {},
+    "selected_count": "{count} selected",
+    "@selected_count": {
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "select_all": "Select all",
+    "@select_all": {},
+    "deselect_all": "Deselect all",
+    "@deselect_all": {},
+    "invert_selection": "Invert selection",
+    "@invert_selection": {},
+    "batch_unsubscribe": "Batch Unsubscribe",
+    "@batch_unsubscribe": {},
+    "batch_unsubscribe_confirm": "Are you sure you want to unsubscribe from {count} users?",
+    "@batch_unsubscribe_confirm": {
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "batch_add_to_group": "Batch Add to Group",
+    "@batch_add_to_group": {},
+    "batch_remove_from_feed": "Batch Remove from Feed",
+    "@batch_remove_from_feed": {},
+    "batch_remove_from_feed_confirm": "Are you sure you want to remove {count} users from the feed?",
+    "@batch_remove_from_feed_confirm": {
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "select_groups": "Select Groups",
+    "@select_groups": {},
+    "confirm": "Confirm",
+    "@confirm": {}
 }
