@@ -46,6 +46,7 @@ import 'package:squawker/utils/misc.dart';
 import 'package:squawker/utils/notifiers.dart';
 import 'package:squawker/utils/translation.dart';
 import 'package:squawker/utils/urls.dart';
+import 'package:squawker/download/download_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 Future checkForUpdates() async {
@@ -229,6 +230,8 @@ Future<void> main() async {
   });
 
   await AccentUtil.load();
+
+  await DownloadService.init();
 
   TwitterAccount.currentAccountTypes = prefService.get(optionTwitterAccountTypes);
 

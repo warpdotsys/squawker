@@ -10,6 +10,7 @@ import 'package:squawker/settings/_data.dart';
 import 'package:squawker/settings/_general.dart';
 import 'package:squawker/settings/_home.dart';
 import 'package:squawker/settings/_theme.dart';
+import 'package:squawker/download/download_settings.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pref/pref.dart';
 
@@ -97,6 +98,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               navigationAnimationsEnabled
                 ? MaterialPageRoute(builder: (context) => SettingsDataFragment(legacyExportPath: _legacyExportPath))
                 : PageRouteBuilder(pageBuilder: (context, anim1, anim2) => SettingsDataFragment(legacyExportPath: _legacyExportPath)),
+            ),
+          ),
+          ListTile(
+            title: const Text('Download'),
+            leading: const Icon(Symbols.download),
+            onTap: () => Navigator.push(
+              context,
+              navigationAnimationsEnabled
+                ? MaterialPageRoute(builder: (context) => const DownloadSettingsPage())
+                : PageRouteBuilder(pageBuilder: (context, anim1, anim2) => const DownloadSettingsPage()),
             ),
           ),
           ListTile(

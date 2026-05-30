@@ -19,6 +19,7 @@ import 'package:squawker/user.dart';
 import 'package:squawker/utils/urls.dart';
 import 'package:squawker/utils/route_util.dart';
 import 'package:squawker/utils/text_util.dart';
+import 'package:squawker/download/download_progress_sheet.dart';
 import 'package:intl/intl.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:pref/pref.dart';
@@ -193,6 +194,46 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
     // We scroll the outer controller (the whole nested scroll view and children) to the top
     // TODO: No animation due to Flutter crashing on huge lists (https://github.com/flutter/flutter/issues/52207) (#607)
     nestedScrollViewKey.currentState?.outerController.jumpTo(0);
+  }
+
+  void _showBatchDownloadDialog(BuildContext context, String username) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Download @$username\'s tweets'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('This will download all tweets from @$username.'),
+            const SizedBox(height: 16),
+            Text(
+              'Note: This may take a while for accounts with many tweets.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              final url = 'https://x.com/$username';
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => DownloadProgressSheet(tweetUrl: url),
+              );
+            },
+            child: const Text('Start Download'),
+          ),
+        ],
+      ),
+    );
   }
 
   List<InlineSpan> _addLinksToText(BuildContext context, String content) {
@@ -531,6 +572,12 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
                               icon: const Icon(Symbols.search),
                               color: Colors.white,
                               onPressed: () => pushNamedRoute(context, routeSearch, SearchArguments(1, focusInputOnOpen: true, query: 'from:@${user.screenName!} ')),
+                            ),
+                            IconButton(
+                              icon: const Icon(Symbols.download),
+                              color: Colors.white,
+                              tooltip: 'Download all tweets',
+                              onPressed: () => _showBatchDownloadDialog(context, user.screenName!),
                             ),
                             FollowButton(user: UserSubscription.fromUser(user), color: Colors.white),
                           ],

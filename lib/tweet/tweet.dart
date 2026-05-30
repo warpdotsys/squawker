@@ -27,6 +27,8 @@ import 'package:squawker/utils/misc.dart';
 import 'package:squawker/utils/route_util.dart';
 import 'package:squawker/utils/translation.dart';
 import 'package:squawker/utils/urls.dart';
+import 'package:squawker/download/download_button.dart';
+import 'package:squawker/download/download_progress_sheet.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -703,6 +705,23 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                                             thickness: 1.0,
                                           ),
                                         ),
+                                        createSheetButton('Download tweet', Symbols.download, () {
+                                          Navigator.pop(context);
+                                          showModalBottomSheet(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (_) => DownloadProgressSheet(
+                                              tweetUrl: 'https://x.com/${tweet.user!.screenName}/status/${tweet.idStr}',
+                                            ),
+                                          );
+                                        }),
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 16),
+                                          child: Divider(
+                                            thickness: 1.0,
+                                          ),
+                                        ),
                                         createSheetButton(L10n.of(context).cancel, Symbols.close_rounded, () {
                                           Navigator.pop(context);
                                         })
@@ -780,6 +799,10 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                                 }
                               }),
                               translateButton,
+                              DownloadButton(
+                                tweetUrl: 'https://x.com/${tweet.user!.screenName}/status/${tweet.idStr}',
+                                isCompact: true,
+                              ),
                             ],
                           ),
                         ),
