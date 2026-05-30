@@ -38,6 +38,61 @@ class _SquawkerTwitterClient extends TwitterClient {
     return getWithRateFetchCtx(uri, headers: headers, timeout: timeout);
   }
 
+  @override
+  Future<http.Response> post(Uri uri, {Map<String, String>? headers, Object? body, Duration? timeout}) async {
+    return postWithAuth(uri, headers: headers, body: body, timeout: timeout);
+  }
+
+  Future<http.Response> postWithAuth(Uri uri, {Map<String, String>? headers, Object? body, Duration? timeout}) async {
+    try {
+      log.info('Posting to $uri');
+      
+      final authHeader = await TwitterHeaders.getAuthHeader();
+      if (authHeader == null) {
+        log.severe('No auth header available for POST request');
+        return Future.error(Exception('Not authenticated'));
+      }
+
+      // Convert auth header to String,String map
+      final authHeaderStr = Map<String, String>.from(authHeader);
+
+      // Merge headers - base headers + auth + custom headers
+      final mergedHeaders = <String, String>{
+        'accept': '*/*',
+        'accept-language': 'en-US,en;q=0.9',
+        'authorization': bearerToken,
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'pragma': 'no-cache',
+        'origin': 'https://x.com',
+        'referer': 'https://x.com',
+        'user-agent': userAgentHeader['user-agent']!,
+        'x-twitter-active-user': 'yes',
+        'x-twitter-client-language': 'en',
+        'x-twitter-auth-type': 'OAuth2Session',
+        ...authHeaderStr,
+        if (headers != null) ...headers,
+      };
+
+      // Use http.post with auth headers
+      final response = await http.post(
+        uri,
+        headers: mergedHeaders,
+        body: body,
+      ).timeout(timeout ?? _defaultTimeout);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      } else {
+        log.severe('POST ${uri.path} failed: ${response.statusCode} - ${utf8.decode(response.bodyBytes.toList())}');
+        return Future.error(response);
+      }
+    } on Exception catch (err) {
+      log.severe('POST ${uri.path} error: ${err.toString()}');
+      return Future.error(ExceptionResponse(err));
+    }
+  }
+
   Future<http.Response> getWithRateFetchCtx(Uri uri, {Map<String, String>? headers, Duration? timeout, RateFetchContext? fetchContext, bool allowUnauthenticated = false}) async {
     try {
       if (allowUnauthenticated && !TwitterAccount.hasAccountAvailable()) {
