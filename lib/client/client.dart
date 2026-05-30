@@ -438,10 +438,12 @@ class Twitter {
           users: paginatedUsers.users ?? []);
     }
 
+    // For followers list
+    var followersResponse = response as dynamic;
     return Follows(
-        cursorBottom: int.parse(response.nextCursorStr ?? '-1'),
-        cursorTop: int.parse(response.previousCursorStr ?? '-1'),
-        users: response.users?.map((e) => UserWithExtra.fromJson(e.toJson())).toList() ?? []);
+        cursorBottom: int.parse(followersResponse.nextCursorStr ?? '-1'),
+        cursorTop: int.parse(followersResponse.previousCursorStr ?? '-1'),
+        users: followersResponse.users?.map((e) => UserWithExtra.fromJson(e.toJson())).toList() ?? []);
   }
 
   static List<TweetChain> createTweetChains(List<dynamic> addEntries) {

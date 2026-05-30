@@ -367,9 +367,9 @@ class SubscriptionUsersListState extends State<SubscriptionUsersList> {
           selectedColor: Theme.of(context).colorScheme.secondary,
           items: groupModel.state.map((e) => MultiSelectItem(e.id, e.name)).toList(),
           initialValue: [],
-          onConfirm: (List<String> memberships) async {
+          onConfirm: (List<dynamic> memberships) async {
             for (var id in selectedIds) {
-              await groupModel.saveUserGroupMembership(id, memberships);
+              await groupModel.saveUserGroupMembership(id, memberships.cast<String>());
             }
           },
         ),
