@@ -47,7 +47,7 @@ class DownloadService {
     }
   }
 
-  Stream<String> downloadTweet(String tweetUrl) async* {
+  static Stream<String> downloadTweet(String tweetUrl) async* {
     var uri = '$_apiBase?url=${Uri.encodeComponent(tweetUrl)}';
     if (_tValue > 0) {
       uri += '&t=$_tValue';
