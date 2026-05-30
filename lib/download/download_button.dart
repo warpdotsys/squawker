@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:squawker/generated/l10n.dart';
 import 'download_progress_sheet.dart';
 
 class DownloadButton extends StatelessWidget {
@@ -21,13 +22,13 @@ class DownloadButton extends StatelessWidget {
         icon: const Icon(Symbols.download, size: 18),
         color: theme.colorScheme.primary,
         onPressed: () => _startDownload(context),
-        tooltip: 'Download this tweet',
+        tooltip: L10n.of(context).download_this_tweet,
       );
     }
 
     return TextButton.icon(
       icon: const Icon(Symbols.download, size: 18),
-      label: const Text('Download', style: TextStyle(fontSize: 14)),
+      label: Text(L10n.of(context).download, style: const TextStyle(fontSize: 14)),
       onPressed: () => _startDownload(context),
     );
   }

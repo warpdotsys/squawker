@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:squawker/generated/l10n.dart';
 import 'download_service.dart';
 
 class DownloadSettingsPage extends StatefulWidget {
@@ -34,22 +35,24 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settings saved')),
+        SnackBar(content: Text(L10n.of(context).settings_saved)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Download Settings'),
+        title: Text(l10n.download_settings),
       ),
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text('Archive Mode'),
-            subtitle: const Text('Pack all files into a ZIP for download'),
+            title: Text(l10n.archive_mode),
+            subtitle: Text(l10n.archive_mode_description),
             value: _archiveMode,
             onChanged: (v) {
               setState(() => _archiveMode = v);
@@ -57,7 +60,7 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
             },
           ),
           ListTile(
-            title: const Text('API Server'),
+            title: Text(l10n.api_server),
             subtitle: Text(_apiEndpoint),
             trailing: const Icon(Symbols.edit),
             onTap: () => _editApiEndpoint(context),
@@ -65,8 +68,8 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
           const Divider(),
           ListTile(
             leading: const Icon(Symbols.info),
-            title: const Text('About'),
-            subtitle: const Text('Download tweets using gallery-dl backend'),
+            title: Text(l10n.about_download),
+            subtitle: Text(l10n.about_download_description),
           ),
         ],
       ),
@@ -74,26 +77,27 @@ class _DownloadSettingsPageState extends State<DownloadSettingsPage> {
   }
 
   Future<void> _editApiEndpoint(BuildContext context) async {
+    final l10n = L10n.of(context);
     final controller = TextEditingController(text: _apiEndpoint);
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('API Server Address'),
+        title: Text(l10n.api_server_address),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'https://example.com/download',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),

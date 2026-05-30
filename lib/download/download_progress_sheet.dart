@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:squawker/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'download_service.dart';
 
@@ -37,7 +38,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
       _isDownloading = true;
       _progress = DownloadProgress(
         state: DownloadState.connecting,
-        message: 'Connecting to server...',
+        message: L10n.of(context).connecting_to_server,
       );
     });
 
@@ -58,7 +59,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
             _isDownloading = false;
             _progress = DownloadProgress(
               state: DownloadState.error,
-              message: 'Download failed: $e',
+              message: '${L10n.of(context).download_failed}: $e',
             );
           });
         }
@@ -74,6 +75,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = L10n.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -94,7 +96,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Download Tweet',
+            l10n.download_tweet_title,
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
@@ -105,7 +107,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 24),
-          _buildStatusWidget(theme),
+          _buildStatusWidget(theme, l10n),
           const SizedBox(height: 24),
           if (_progress?.state == DownloadState.completed &&
               _progress?.downloadUrl != null)
@@ -113,7 +115,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Symbols.open_in_browser),
-                label: const Text('Open Download Link'),
+                label: Text(l10n.open_download_link),
                 onPressed: () => launchUrl(Uri.parse(_progress!.downloadUrl!)),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -125,7 +127,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
               width: double.infinity,
               child: OutlinedButton.icon(
                 icon: const Icon(Symbols.refresh),
-                label: const Text('Retry'),
+                label: Text(l10n.retry),
                 onPressed: _isDownloading ? null : _retry,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -138,7 +140,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
               padding: const EdgeInsets.only(top: 8),
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: Text(l10n.close),
               ),
             ),
           const SizedBox(height: 16),
@@ -147,7 +149,7 @@ class _DownloadProgressSheetState extends State<DownloadProgressSheet> {
     );
   }
 
-  Widget _buildStatusWidget(ThemeData theme) {
+  Widget _buildStatusWidget(ThemeData theme, L10n l10n) {
     if (_progress == null) return const SizedBox();
 
     IconData icon;

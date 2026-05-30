@@ -101,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            title: const Text('Download'),
+            title: Text(L10n.of(context).download),
             leading: const Icon(Symbols.download),
             onTap: () => Navigator.push(
               context,

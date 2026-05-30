@@ -197,18 +197,19 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
   }
 
   void _showBatchDownloadDialog(BuildContext context, String username) {
+    final l10n = L10n.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Download @$username\'s tweets'),
+        title: Text(l10n.download_username_tweets(username)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('This will download all tweets from @$username.'),
+            Text(l10n.download_username_tweets_description(username)),
             const SizedBox(height: 16),
             Text(
-              'Note: This may take a while for accounts with many tweets.',
+              l10n.download_large_account_warning,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -216,7 +217,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -229,7 +230,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
                 builder: (_) => DownloadProgressSheet(tweetUrl: url),
               );
             },
-            child: const Text('Start Download'),
+            child: Text(l10n.start_download),
           ),
         ],
       ),
@@ -576,7 +577,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> with TickerProvid
                             IconButton(
                               icon: const Icon(Symbols.download),
                               color: Colors.white,
-                              tooltip: 'Download all tweets',
+                              tooltip: L10n.of(context).download_all_tweets,
                               onPressed: () => _showBatchDownloadDialog(context, user.screenName!),
                             ),
                             FollowButton(user: UserSubscription.fromUser(user), color: Colors.white),

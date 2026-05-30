@@ -705,7 +705,7 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                                             thickness: 1.0,
                                           ),
                                         ),
-                                        createSheetButton('Download tweet', Symbols.download, () {
+                                        createSheetButton(L10n.of(context).download_tweet, Symbols.download, () {
                                           Navigator.pop(context);
                                           showModalBottomSheet(
                                             context: context,
