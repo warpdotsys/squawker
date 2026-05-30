@@ -83,6 +83,14 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
 
   List<String> _extraContextMenuItems = [];
 
+  // Track like/retweet state
+  late bool _isLiked;
+  late bool _isRetweeted;
+  late int _likeCount;
+  late int _retweetCount;
+  bool _isProcessingLike = false;
+  bool _isProcessingRetweet = false;
+
   final GlobalKey _globalKey = GlobalKey();
 
   static String? _convertRunesToText(Iterable<int> runes, int start, [int? end]) {
@@ -242,6 +250,12 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
     isThread = widget.isThread;
     isBirdwatchQuote = widget.isBirdwatchQuote;
 
+    // Initialize like/retweet state
+    _isLiked = tweet.favorited ?? false;
+    _isRetweeted = tweet.retweeted ?? false;
+    _likeCount = tweet.favoriteCount ?? 0;
+    _retweetCount = tweet.retweetCount ?? 0;
+
     // Get the text to display from the actual tweet, i.e. the retweet if there is one, otherwise we end up with "RT @" crap in our text
     var actualTweet = tweet.retweetedStatusWithCard ?? tweet;
 
@@ -363,6 +377,162 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
     final Uint8List pngBytes = byteData.buffer.asUint8List();
 
     return pngBytes;
+  }
+
+  Future<void> _toggleLike(BuildContext context) async {
+    if (_isProcessingLike) return;
+
+    setState(() {
+      _isProcessingLike = true;
+    });
+
+    final l10n = L10n.of(context);
+    final scaffold = ScaffoldMessenger.of(context);
+    bool success;
+
+    if (_isLiked) {
+      success = await Twitter.unfavoriteTweet(tweet.idStr!);
+      if (success) {
+        setState(() {
+          _isLiked = false;
+          _likeCount = (_likeCount - 1).clamp(0, 999999);
+        });
+      }
+    } else {
+      success = await Twitter.favoriteTweet(tweet.idStr!);
+      if (success) {
+        setState(() {
+          _isLiked = true;
+          _likeCount += 1;
+        });
+      }
+    }
+
+    setState(() {
+      _isProcessingLike = false;
+    });
+
+    if (!success && context.mounted) {
+      scaffold.showSnackBar(
+        SnackBar(content: Text(l10n.action_failed), duration: const Duration(seconds: 2)),
+      );
+    }
+  }
+
+  Future<void> _toggleRetweet(BuildContext context) async {
+    if (_isProcessingRetweet) return;
+
+    // Show confirmation dialog for retweet
+    if (!_isRetweeted) {
+      final l10n = L10n.of(context);
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.retweet),
+          content: Text(l10n.retweet_confirm),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.retweet)),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+
+    setState(() {
+      _isProcessingRetweet = true;
+    });
+
+    final l10n = L10n.of(context);
+    final scaffold = ScaffoldMessenger.of(context);
+    bool success;
+
+    if (_isRetweeted) {
+      success = await Twitter.unretweetTweet(tweet.idStr!);
+      if (success) {
+        setState(() {
+          _isRetweeted = false;
+          _retweetCount = (_retweetCount - 1).clamp(0, 999999);
+        });
+      }
+    } else {
+      success = await Twitter.retweetTweet(tweet.idStr!);
+      if (success) {
+        setState(() {
+          _isRetweeted = true;
+          _retweetCount += 1;
+        });
+      }
+    }
+
+    setState(() {
+      _isProcessingRetweet = false;
+    });
+
+    if (!success && context.mounted) {
+      scaffold.showSnackBar(
+        SnackBar(content: Text(l10n.action_failed), duration: const Duration(seconds: 2)),
+      );
+    }
+  }
+
+  void _showReplyDialog(BuildContext context) {
+    final l10n = L10n.of(context);
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.reply_to(tweet.user!.screenName!)),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: l10n.reply_hint,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+
+              Navigator.pop(ctx);
+
+              final scaffold = ScaffoldMessenger.of(context);
+              final result = await Twitter.createTweet(
+                text: text,
+                replyToTweetId: tweet.idStr,
+              );
+
+              if (context.mounted) {
+                if (result != null && result['data']?['create_tweet']?['tweet_results']?['result']?['rest_id'] != null) {
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.reply_sent),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.action_failed),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(l10n.reply),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -787,17 +957,26 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
+                              // Reply button
                               _createFooterTextButton(
                                   Symbols.comment,
                                   tweet.replyCount != null ? numberFormat.format(tweet.replyCount) : '',
                                   null,
-                                  () => onClickOpenTweet(tweet)),
+                                  () => _showReplyDialog(context)),
+                              // Retweet button
                               if (tweet.retweetCount != null || tweet.quoteCount != null)
-                                _createFooterTextButton(Symbols.repeat,
-                                    numberFormat.format((tweet.retweetCount ?? 0) + (tweet.quoteCount ?? 0))),
+                                _createFooterTextButton(
+                                    _isRetweeted ? Symbols.repeat : Symbols.repeat,
+                                    numberFormat.format(_retweetCount),
+                                    _isRetweeted ? Colors.green : null,
+                                    _isProcessingRetweet ? null : () => _toggleRetweet(context)),
+                              // Like button
                               if (tweet.favoriteCount != null)
                                 _createFooterTextButton(
-                                    Symbols.favorite_border, numberFormat.format(tweet.favoriteCount)),
+                                    _isLiked ? Symbols.favorite : Symbols.favorite_border,
+                                    numberFormat.format(_likeCount),
+                                    _isLiked ? Colors.red : null,
+                                    _isProcessingLike ? null : () => _toggleLike(context)),
                               const SizedBox(
                                 width: 8.0,
                               ),

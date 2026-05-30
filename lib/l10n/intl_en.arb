@@ -698,5 +698,25 @@
     "select_groups": "Select Groups",
     "@select_groups": {},
     "confirm": "Confirm",
-    "@confirm": {}
+    "@confirm": {},
+    "retweet": "Retweet",
+    "@retweet": {},
+    "retweet_confirm": "Retweet this tweet?",
+    "@retweet_confirm": {},
+    "reply": "Reply",
+    "@reply": {},
+    "reply_to": "Reply to @{username}",
+    "@reply_to": {
+      "placeholders": {
+        "username": {
+          "type": "String"
+        }
+      }
+    },
+    "reply_hint": "Write your reply...",
+    "@reply_hint": {},
+    "reply_sent": "Reply sent!",
+    "@reply_sent": {},
+    "action_failed": "Action failed",
+    "@action_failed": {}
 }

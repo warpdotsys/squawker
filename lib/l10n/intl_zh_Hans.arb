@@ -732,5 +732,25 @@
     "select_groups": "选择订阅组",
     "@select_groups": {},
     "confirm": "确认",
-    "@confirm": {}
+    "@confirm": {},
+    "retweet": "转推",
+    "@retweet": {},
+    "retweet_confirm": "确定要转推这条推文吗？",
+    "@retweet_confirm": {},
+    "reply": "回复",
+    "@reply": {},
+    "reply_to": "回复 @{username}",
+    "@reply_to": {
+      "placeholders": {
+        "username": {
+          "type": "String"
+        }
+      }
+    },
+    "reply_hint": "写下你的回复...",
+    "@reply_hint": {},
+    "reply_sent": "回复已发送！",
+    "@reply_sent": {},
+    "action_failed": "操作失败",
+    "@action_failed": {}
 }
