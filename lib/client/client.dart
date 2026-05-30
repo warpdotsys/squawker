@@ -461,7 +461,15 @@ class Twitter {
       );
 
       final result = jsonDecode(response.body);
-      return result?['data']?['favorite_tweet']?['tweet_results']?['result']?['rest_id'] != null;
+      
+      // Check for errors
+      if (result?['errors'] != null && (result['errors'] as List).isNotEmpty) {
+        Logger.root.warning('FavoriteTweet error: ${result['errors'][0]['message']}');
+        return false;
+      }
+      
+      // Success returns "Done" string
+      return result?['data']?['favorite_tweet'] == 'Done';
     } catch (e) {
       Logger.root.severe('Failed to favorite tweet: $e');
       return false;
@@ -483,7 +491,13 @@ class Twitter {
       );
 
       final result = jsonDecode(response.body);
-      return result?['data']?['unfavorite_tweet']?['tweet_results']?['result']?['rest_id'] != null;
+      
+      if (result?['errors'] != null && (result['errors'] as List).isNotEmpty) {
+        Logger.root.warning('UnfavoriteTweet error: ${result['errors'][0]['message']}');
+        return false;
+      }
+      
+      return result?['data']?['unfavorite_tweet'] == 'Done';
     } catch (e) {
       Logger.root.severe('Failed to unfavorite tweet: $e');
       return false;
@@ -505,6 +519,12 @@ class Twitter {
       );
 
       final result = jsonDecode(response.body);
+      
+      if (result?['errors'] != null && (result['errors'] as List).isNotEmpty) {
+        Logger.root.warning('CreateRetweet error: ${result['errors'][0]['message']}');
+        return false;
+      }
+      
       return result?['data']?['create_retweet']?['retweet_results']?['result']?['rest_id'] != null;
     } catch (e) {
       Logger.root.severe('Failed to retweet: $e');
@@ -527,6 +547,12 @@ class Twitter {
       );
 
       final result = jsonDecode(response.body);
+      
+      if (result?['errors'] != null && (result['errors'] as List).isNotEmpty) {
+        Logger.root.warning('DeleteRetweet error: ${result['errors'][0]['message']}');
+        return false;
+      }
+      
       return result?['data']?['unretweet']?['source_tweet_results']?['result']?['rest_id'] != null;
     } catch (e) {
       Logger.root.severe('Failed to unretweet: $e');
@@ -633,6 +659,12 @@ class Twitter {
       );
 
       final result = jsonDecode(response.body);
+      
+      if (result?['errors'] != null && (result['errors'] as List).isNotEmpty) {
+        Logger.root.warning('DeleteTweet error: ${result['errors'][0]['message']}');
+        return false;
+      }
+      
       return result?['data']?['delete_tweet']?['tweet_results']?['result']?['rest_id'] != null;
     } catch (e) {
       Logger.root.severe('Failed to delete tweet: $e');
