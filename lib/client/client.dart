@@ -15,6 +15,8 @@ import 'package:squawker/utils/iterables.dart';
 import 'package:squawker/utils/misc.dart';
 import 'package:squawker/client/client_account.dart';
 import 'package:squawker/client/client_x_regular_account.dart';
+import 'package:squawker/client/headers.dart';
+import 'package:squawker/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:quiver/iterables.dart';
@@ -39,7 +41,7 @@ class _SquawkerTwitterClient extends TwitterClient {
   }
 
   @override
-  Future<http.Response> post(Uri uri, {Map<String, String>? headers, Object? body, Duration? timeout}) async {
+  Future<http.Response> post(Uri uri, {Map<String, String>? headers, Object? body, Encoding? encoding, Duration? timeout}) async {
     return postWithAuth(uri, headers: headers, body: body, timeout: timeout);
   }
 
