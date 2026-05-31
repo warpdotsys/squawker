@@ -9,6 +9,7 @@ import 'package:squawker/group/group_screen.dart';
 import 'package:squawker/home/_home_timeline_feed.dart';
 import 'package:squawker/home/home_screen.dart';
 import 'package:squawker/generated/l10n.dart';
+import 'package:squawker/tweet/compose_dialog.dart';
 import 'package:squawker/utils/data_service.dart';
 
 
@@ -178,80 +179,98 @@ class FeedScreenState extends State<FeedScreen> with AutomaticKeepAliveClientMix
     final l10n = L10n.of(context);
 
     return SafeArea(
-      child: GestureDetector(
-        onTap: _handleDoubleTap,
-        behavior: HitTestBehavior.translucent,
-        child: Column(
-          children: [
-            // Mode selector at the top
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: SegmentedButton<FeedMode>(
-                segments: [
-                  ButtonSegment<FeedMode>(
-                    value: FeedMode.forYou,
-                    label: Text(l10n.feed_for_you),
-                    icon: const Icon(Symbols.auto_awesome, size: 18),
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: _handleDoubleTap,
+            behavior: HitTestBehavior.translucent,
+            child: Column(
+              children: [
+                // Mode selector at the top
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: SegmentedButton<FeedMode>(
+                    segments: [
+                      ButtonSegment<FeedMode>(
+                        value: FeedMode.forYou,
+                        label: Text(l10n.feed_for_you),
+                        icon: const Icon(Symbols.auto_awesome, size: 18),
+                      ),
+                      ButtonSegment<FeedMode>(
+                        value: FeedMode.following,
+                        label: Text(l10n.feed_following),
+                        icon: const Icon(Symbols.people, size: 18),
+                      ),
+                      ButtonSegment<FeedMode>(
+                        value: FeedMode.subscriptions,
+                        label: Text(l10n.feed),
+                        icon: const Icon(Symbols.rss_feed, size: 18),
+                      ),
+                    ],
+                    selected: {_feedMode},
+                    onSelectionChanged: (Set<FeedMode> selected) {
+                      _switchMode(selected.first);
+                    },
+                    style: ButtonStyle(
+                      visualDensity: VisualDensity.compact,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                   ),
-                  ButtonSegment<FeedMode>(
-                    value: FeedMode.following,
-                    label: Text(l10n.feed_following),
-                    icon: const Icon(Symbols.people, size: 18),
-                  ),
-                  ButtonSegment<FeedMode>(
-                    value: FeedMode.subscriptions,
-                    label: Text(l10n.feed),
-                    icon: const Icon(Symbols.rss_feed, size: 18),
-                  ),
-                ],
-                selected: {_feedMode},
-                onSelectionChanged: (Set<FeedMode> selected) {
-                  _switchMode(selected.first);
-                },
-                style: ButtonStyle(
-                  visualDensity: VisualDensity.compact,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-              ),
-            ),
-            // Feed content with PageView for swipe
-            Expanded(
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (notification) {
-                  // Detect edge swipe to switch outer tabs
-                  if (notification is OverscrollNotification) {
-                    if (notification.overscroll < -50 && _feedMode == FeedMode.forYou) {
-                      _handleEdgeSwipe(false); // swipe right -> previous tab
-                    } else if (notification.overscroll > 50 && _feedMode == FeedMode.subscriptions) {
-                      _handleEdgeSwipe(true); // swipe left -> next tab
-                    }
-                  }
-                  return false;
-                },
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  children: [
-                    HomeTimelineFeed(
-                      key: _forYouKey,
-                      type: HomeTimelineType.forYou,
+                // Feed content with PageView for swipe
+                Expanded(
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      // Detect edge swipe to switch outer tabs
+                      if (notification is OverscrollNotification) {
+                        if (notification.overscroll < -50 && _feedMode == FeedMode.forYou) {
+                          _handleEdgeSwipe(false); // swipe right -> previous tab
+                        } else if (notification.overscroll > 50 && _feedMode == FeedMode.subscriptions) {
+                          _handleEdgeSwipe(true); // swipe left -> next tab
+                        }
+                      }
+                      return false;
+                    },
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: _onPageChanged,
+                      children: [
+                        HomeTimelineFeed(
+                          key: _forYouKey,
+                          type: HomeTimelineType.forYou,
+                        ),
+                        HomeTimelineFeed(
+                          key: _followingKey,
+                          type: HomeTimelineType.following,
+                        ),
+                        SubscriptionGroupScreen(
+                          scrollController: widget.scrollController,
+                          id: widget.id,
+                          name: widget.name,
+                          actions: createCommonAppBarActions(context),
+                        ),
+                      ],
                     ),
-                    HomeTimelineFeed(
-                      key: _followingKey,
-                      type: HomeTimelineType.following,
-                    ),
-                    SubscriptionGroupScreen(
-                      scrollController: widget.scrollController,
-                      id: widget.id,
-                      name: widget.name,
-                      actions: createCommonAppBarActions(context),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // Compose FAB
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => const ComposeDialog(),
+                );
+              },
+              child: const Icon(Symbols.edit),
+            ),
+          ),
+        ],
       ),
     );
   }

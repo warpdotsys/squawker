@@ -18,6 +18,7 @@ import 'package:squawker/tweet/_card.dart';
 import 'package:squawker/tweet/_context_menu.dart';
 import 'package:squawker/tweet/_entities.dart';
 import 'package:squawker/tweet/_media.dart';
+import 'package:squawker/tweet/compose_dialog.dart';
 import 'package:squawker/ui/dates.dart';
 import 'package:squawker/ui/errors.dart';
 import 'package:squawker/user.dart';
@@ -477,60 +478,11 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
   }
 
   void _showReplyDialog(BuildContext context) {
-    final l10n = L10n.of(context);
-    final controller = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.reply_to(tweet.user!.screenName!)),
-        content: TextField(
-          controller: controller,
-          maxLines: 4,
-          decoration: InputDecoration(
-            hintText: l10n.reply_hint,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final text = controller.text.trim();
-              if (text.isEmpty) return;
-
-              Navigator.pop(ctx);
-
-              final scaffold = ScaffoldMessenger.of(context);
-              final result = await Twitter.createTweet(
-                text: text,
-                replyToTweetId: tweet.idStr,
-              );
-
-              if (context.mounted) {
-                if (result != null && result['data']?['create_tweet']?['tweet_results']?['result']?['rest_id'] != null) {
-                  scaffold.showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.reply_sent),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  scaffold.showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.action_failed),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(l10n.reply),
-          ),
-        ],
+      builder: (ctx) => ComposeDialog(
+        replyToTweetId: tweet.idStr,
+        replyToUsername: tweet.user!.screenName,
       ),
     );
   }

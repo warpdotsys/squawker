@@ -623,16 +623,23 @@ class Twitter {
     String? replyToTweetId,
     String? attachmentUrl,
     List<String> excludeReplyUserIds = const [],
+    List<Map<String, dynamic>> mediaEntities = const [],
+    Map<String, dynamic>? conversationControl,
+    Map<String, dynamic>? contentDisclosure,
+    Map<String, dynamic>? poll,
   }) async {
     try {
       final uri = Uri.https('x.com', '/i/api/graphql/H-t2v_HvFR07ZBP9aOeKoA/CreateTweet');
 
       final variables = <String, dynamic>{
         'tweet_text': text,
-        'media': {'media_entities': [], 'possibly_sensitive': false},
+        'media': {
+          'media_entities': mediaEntities,
+          'possibly_sensitive': false,
+        },
         'semantic_annotation_ids': [],
         'disallowed_reply_options': null,
-        'semantic_annotation_options': {'source': 'Unknown'},
+        'semantic_annotation_options': {'source': 'Profile'},
       };
 
       if (replyToTweetId != null) {
@@ -644,6 +651,18 @@ class Twitter {
 
       if (attachmentUrl != null) {
         variables['attachment_url'] = attachmentUrl;
+      }
+
+      if (conversationControl != null) {
+        variables['conversation_control'] = conversationControl;
+      }
+
+      if (contentDisclosure != null) {
+        variables['content_disclosure'] = contentDisclosure;
+      }
+
+      if (poll != null) {
+        variables['poll'] = poll;
       }
 
       final body = jsonEncode({
