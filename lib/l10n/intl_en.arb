@@ -718,5 +718,11 @@
     "reply_sent": "Reply sent!",
     "@reply_sent": {},
     "action_failed": "Action failed",
-    "@action_failed": {}
+    "@action_failed": {},
+    "delete_tweet": "Delete tweet",
+    "@delete_tweet": {},
+    "delete_tweet_confirm": "Are you sure you want to delete this tweet?",
+    "@delete_tweet_confirm": {},
+    "tweet_deleted": "Tweet deleted",
+    "@tweet_deleted": {}
 }

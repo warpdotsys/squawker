@@ -908,6 +908,50 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                                             }
                                           }
                                         }),
+                                        if (currentUsername != null && currentUsername == tweet.user!.screenName)
+                                          createSheetButton(L10n.of(context).delete_tweet, Symbols.delete, () async {
+                                            Navigator.pop(context);
+                                            final l10n = L10n.of(context);
+                                            final scaffold = ScaffoldMessenger.of(context);
+                                            
+                                            final confirmed = await showDialog<bool>(
+                                              context: context,
+                                              builder: (ctx) => AlertDialog(
+                                                title: Text(l10n.delete_tweet),
+                                                content: Text(l10n.delete_tweet_confirm),
+                                                actions: [
+                                                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+                                                  ElevatedButton(
+                                                    onPressed: () => Navigator.pop(ctx, true),
+                                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                                    child: Text(l10n.delete),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                            
+                                            if (confirmed == true) {
+                                              final success = await Twitter.deleteTweet(tweet.idStr!);
+                                              if (context.mounted) {
+                                                if (success) {
+                                                  scaffold.showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(l10n.tweet_deleted),
+                                                      backgroundColor: Colors.green,
+                                                    ),
+                                                  );
+                                                  DataService().map['toggleRefreshFeed'] = true;
+                                                } else {
+                                                  scaffold.showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(l10n.action_failed),
+                                                      backgroundColor: Colors.red,
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            }
+                                          }),
                                         const Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 16),
                                           child: Divider(

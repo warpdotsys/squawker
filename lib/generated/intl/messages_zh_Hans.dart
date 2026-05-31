@@ -69,12 +69,15 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "about": MessageLookupByLibrary.simpleMessage("关于"),
+    "about_download": MessageLookupByLibrary.simpleMessage("关于"),
+    "about_download_description": MessageLookupByLibrary.simpleMessage("使用 gallery-dl 后端下载推文"),
     "account": MessageLookupByLibrary.simpleMessage("账户"),
     "account_suspended": MessageLookupByLibrary.simpleMessage("账号已被冻结"),
     "activate_non_confirmation_bias_mode_description":
         MessageLookupByLibrary.simpleMessage("隐藏推文作者以避免基于权威论据的确认偏向。"),
     "activate_non_confirmation_bias_mode_label":
         MessageLookupByLibrary.simpleMessage("激活非确认偏向模式"),
+    "action_failed": MessageLookupByLibrary.simpleMessage("操作失败"),
     "add_account": MessageLookupByLibrary.simpleMessage("添加账户"),
     "add_account_title": MessageLookupByLibrary.simpleMessage("添加账户"),
     "add_subscriptions": MessageLookupByLibrary.simpleMessage("添加订阅"),
@@ -95,6 +98,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Squawker 有新版本 🚀",
     ),
     "api_key": MessageLookupByLibrary.simpleMessage("API 密钥"),
+    "api_server": MessageLookupByLibrary.simpleMessage("API 服务器"),
+    "api_server_address": MessageLookupByLibrary.simpleMessage("API 服务器地址"),
     "app_info": MessageLookupByLibrary.simpleMessage("应用程序信息"),
     "are_you_sure": MessageLookupByLibrary.simpleMessage("你确定吗？"),
     "are_you_sure_you_want_to_delete_the_subscription_group_name_of_group": m0,
@@ -102,6 +107,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "bad_guest_token": MessageLookupByLibrary.simpleMessage(
       "Twitter/X 使我们的访问令牌无效。请尝试重新打开 Squawker！",
     ),
+    "batch_add_to_group": MessageLookupByLibrary.simpleMessage("批量添加到订阅组"),
+    "batch_remove_from_feed": MessageLookupByLibrary.simpleMessage("批量从时间轴移除"),
+    "batch_remove_from_feed_confirm": MessageLookupByLibrary.simpleMessage("确定要从时间轴移除 {count} 个用户吗？"),
+    "batch_unsubscribe": MessageLookupByLibrary.simpleMessage("批量取消订阅"),
+    "batch_unsubscribe_confirm": MessageLookupByLibrary.simpleMessage("确定要取消订阅 {count} 个用户吗？"),
     "beta": MessageLookupByLibrary.simpleMessage("测试版"),
     "blue_theme_based_on_the_twitter_color_scheme":
         MessageLookupByLibrary.simpleMessage("基于 Twitter/X 配色方案的蓝色主题"),
@@ -114,6 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirm_close_fritter": MessageLookupByLibrary.simpleMessage(
       "确定要关闭 Squawker 吗？",
     ),
+    "confirm": MessageLookupByLibrary.simpleMessage("确认"),
     "contribute": MessageLookupByLibrary.simpleMessage("贡献 💖"),
     "copied_address_to_clipboard": MessageLookupByLibrary.simpleMessage(
       "已将地址复制到剪切板",
@@ -141,6 +152,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "default_subscription_tab": MessageLookupByLibrary.simpleMessage("关注页默认标签"),
     "default_tab": MessageLookupByLibrary.simpleMessage("默认页面"),
     "delete": MessageLookupByLibrary.simpleMessage("删除"),
+    "delete_tweet": MessageLookupByLibrary.simpleMessage("删除推文"),
+    "delete_tweet_confirm": MessageLookupByLibrary.simpleMessage("确定要删除这条推文吗？"),
+    "deselect_all": MessageLookupByLibrary.simpleMessage("取消全选"),
     "disable_screenshots": MessageLookupByLibrary.simpleMessage("禁用截屏"),
     "disable_screenshots_hint": MessageLookupByLibrary.simpleMessage(
       "防止截屏。可能不适用于所有设备。",
@@ -151,6 +165,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "donate": MessageLookupByLibrary.simpleMessage("捐赠"),
     "download": MessageLookupByLibrary.simpleMessage("下载"),
+    "download_all_tweets": MessageLookupByLibrary.simpleMessage("下载所有推文"),
+    "download_completed": MessageLookupByLibrary.simpleMessage("下载完成！"),
+    "download_failed": MessageLookupByLibrary.simpleMessage("下载失败"),
     "download_handling": MessageLookupByLibrary.simpleMessage("下载处理"),
     "download_handling_description": MessageLookupByLibrary.simpleMessage(
       "下载应该如何工作",
@@ -159,6 +176,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "download_handling_type_directory": MessageLookupByLibrary.simpleMessage(
       "保存到目录",
     ),
+    "download_mode": MessageLookupByLibrary.simpleMessage("下载模式"),
+    "download_mode_fast": MessageLookupByLibrary.simpleMessage("快速 (T=3)"),
+    "download_mode_full_scan": MessageLookupByLibrary.simpleMessage("全量扫描"),
+    "download_mode_safe": MessageLookupByLibrary.simpleMessage("稳健 (T=20)"),
+    "download_settings": MessageLookupByLibrary.simpleMessage("下载设置"),
+    "download_started": MessageLookupByLibrary.simpleMessage("下载已开始..."),
+    "download_this_tweet": MessageLookupByLibrary.simpleMessage("下载此推文"),
+    "download_tweet": MessageLookupByLibrary.simpleMessage("下载推文"),
     "download_media_no_url": MessageLookupByLibrary.simpleMessage(
       "无法下载。 此媒体可能仅作为在线流提供，Squawker 尚无法下载。",
     ),
@@ -250,6 +275,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "imported_snapshot_data_users_so_far": m7,
     "include_replies": MessageLookupByLibrary.simpleMessage("包括回复"),
     "include_retweets": MessageLookupByLibrary.simpleMessage("包括转推"),
+    "invert_selection": MessageLookupByLibrary.simpleMessage("反选"),
     "joined": m8,
     "keep_feed_offset_description": MessageLookupByLibrary.simpleMessage(
       "应用重启时，会保持时间轴的滚动位置不变",
@@ -367,11 +393,17 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "remove_from_feed": MessageLookupByLibrary.simpleMessage("从时间轴中移除"),
     "replying_to": MessageLookupByLibrary.simpleMessage("回复"),
+    "reply": MessageLookupByLibrary.simpleMessage("回复"),
+    "reply_hint": MessageLookupByLibrary.simpleMessage("写下你的回复..."),
+    "reply_sent": MessageLookupByLibrary.simpleMessage("回复已发送！"),
+    "reply_to": MessageLookupByLibrary.simpleMessage("回复 @{username}"),
     "report": MessageLookupByLibrary.simpleMessage("报告"),
     "report_a_bug": MessageLookupByLibrary.simpleMessage("报告 Bug 🐞"),
     "reporting_an_error": MessageLookupByLibrary.simpleMessage("发送错误报告"),
     "reset_home_pages": MessageLookupByLibrary.simpleMessage("将页面重置为默认值"),
     "retry": MessageLookupByLibrary.simpleMessage("重试"),
+    "retweet": MessageLookupByLibrary.simpleMessage("转推"),
+    "retweet_confirm": MessageLookupByLibrary.simpleMessage("确定要转推这条推文吗？"),
     "save": MessageLookupByLibrary.simpleMessage("保存"),
     "save_bandwidth_using_smaller_images": MessageLookupByLibrary.simpleMessage(
       "使用较小的图像以节省带宽",
@@ -383,10 +415,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "search": MessageLookupByLibrary.simpleMessage("搜索"),
     "search_term": MessageLookupByLibrary.simpleMessage("搜索词"),
     "select": MessageLookupByLibrary.simpleMessage("选择"),
+    "select_all": MessageLookupByLibrary.simpleMessage("全选"),
+    "select_groups": MessageLookupByLibrary.simpleMessage("选择订阅组"),
+    "selected_count": MessageLookupByLibrary.simpleMessage("已选择 {count} 项"),
     "selecting_individual_accounts_to_import_and_assigning_groups_are_both_planned_for_the_future_already":
         MessageLookupByLibrary.simpleMessage("未来我们会支持导入单个账号到指定组！"),
     "send": MessageLookupByLibrary.simpleMessage("发送"),
     "settings": MessageLookupByLibrary.simpleMessage("设置"),
+    "settings_saved": MessageLookupByLibrary.simpleMessage("设置已保存"),
     "share_base_url": MessageLookupByLibrary.simpleMessage("自定义分享 URL"),
     "share_base_url_description": MessageLookupByLibrary.simpleMessage(
       "分享时使用自定义的基 URL",
@@ -470,6 +506,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "推文的字体大小",
     ),
     "tweet_font_size_label": MessageLookupByLibrary.simpleMessage("字体大小"),
+    "tweet_deleted": MessageLookupByLibrary.simpleMessage("推文已删除"),
     "tweets": MessageLookupByLibrary.simpleMessage("推文"),
     "tweets_and_replies": MessageLookupByLibrary.simpleMessage("推文和回复"),
     "tweets_number": m17,

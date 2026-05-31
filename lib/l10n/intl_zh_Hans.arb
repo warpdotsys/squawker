@@ -752,5 +752,11 @@
     "reply_sent": "回复已发送！",
     "@reply_sent": {},
     "action_failed": "操作失败",
-    "@action_failed": {}
+    "@action_failed": {},
+    "delete_tweet": "删除推文",
+    "@delete_tweet": {},
+    "delete_tweet_confirm": "确定要删除这条推文吗？",
+    "@delete_tweet_confirm": {},
+    "tweet_deleted": "推文已删除",
+    "@tweet_deleted": {}
 }
