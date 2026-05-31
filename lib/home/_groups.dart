@@ -4,6 +4,7 @@ import 'package:squawker/generated/l10n.dart';
 import 'package:squawker/group/group_model.dart';
 import 'package:squawker/home/home_screen.dart';
 import 'package:squawker/subscriptions/_groups.dart';
+import 'package:squawker/subscriptions/_import_to_tag.dart';
 import 'package:provider/provider.dart';
 
 class GroupsScreen extends StatelessWidget {
@@ -24,6 +25,16 @@ class GroupsScreen extends StatelessWidget {
             floating: true,
             title: Text(L10n.current.groups),
             actions: [
+              IconButton(
+                icon: const Icon(Symbols.download),
+                tooltip: L10n.of(context).import_following,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => const ImportFollowingToTagDialog(),
+                  );
+                },
+              ),
               PopupMenuButton<String>(
                 icon: const Icon(Symbols.sort_rounded),
                 itemBuilder: (context) => [
