@@ -12,6 +12,7 @@ import 'package:squawker/constants.dart';
 import 'package:squawker/database/entities.dart';
 import 'package:squawker/database/repository.dart';
 import 'package:squawker/generated/l10n.dart';
+import 'package:squawker/profile/profile.dart';
 import 'package:squawker/tweet/_video.dart';
 import 'package:squawker/tweet/conversation.dart';
 import 'package:squawker/tweet/tweet.dart';
@@ -27,7 +28,7 @@ enum HomeTimelineType {
 
 class HomeTimelineFeed extends StatefulWidget {
   final HomeTimelineType type;
-  final ItemScrollController? scrollController;
+  final ScrollController? scrollController;
 
   const HomeTimelineFeed({
     Key? key,
@@ -44,6 +45,7 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
   static final Lock _lock = Lock();
 
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  final ItemScrollController _itemScrollController = ItemScrollController();
 
   late VisiblePositionState _visiblePositionState;
   late ItemPositionsListener _itemPositionsListener;
@@ -86,12 +88,6 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
     if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
       updateOffset();
     }
-  }
-
-  @override
-  Future<AppExitResponse> didRequestAppExit() async {
-    updateOffset();
-    return super.didRequestAppExit();
   }
 
   Future<void> _checkFetchData() async {
@@ -305,7 +301,7 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_toScroll) {
         _toScroll = false;
-        widget.scrollController!.jumpTo(index: _visiblePositionState.scrollChainIdx!);
+        _itemScrollController.jumpTo(index: _visiblePositionState.scrollChainIdx!);
       }
       if (_errorResponse != null && _data.isNotEmpty && (_errorResponse!.statusCode < 200 || _errorResponse!.statusCode >= 300)) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -401,7 +397,7 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
                             visiblePositionState: _visiblePositionState,
                           );
                         },
-                        itemScrollController: widget.scrollController,
+                        itemScrollController: _itemScrollController,
                         itemPositionsListener: _itemPositionsListener,
                         padding: const EdgeInsets.only(top: 4),
                       ),
