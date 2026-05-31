@@ -724,5 +724,9 @@
     "delete_tweet_confirm": "Are you sure you want to delete this tweet?",
     "@delete_tweet_confirm": {},
     "tweet_deleted": "Tweet deleted",
-    "@tweet_deleted": {}
+    "@tweet_deleted": {},
+    "feed_for_you": "For You",
+    "@feed_for_you": {},
+    "feed_following": "Following",
+    "@feed_following": {}
 }

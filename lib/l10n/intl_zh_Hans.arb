@@ -758,5 +758,9 @@
     "delete_tweet_confirm": "确定要删除这条推文吗？",
     "@delete_tweet_confirm": {},
     "tweet_deleted": "推文已删除",
-    "@tweet_deleted": {}
+    "@tweet_deleted": {},
+    "feed_for_you": "为你推荐",
+    "@feed_for_you": {},
+    "feed_following": "你关注的",
+    "@feed_following": {}
 }

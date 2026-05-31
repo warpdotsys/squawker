@@ -3109,6 +3109,26 @@ class L10n {
       args: [],
     );
   }
+
+  /// `For You`
+  String get feed_for_you {
+    return Intl.message(
+      'For You',
+      name: 'feed_for_you',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Following`
+  String get feed_following {
+    return Intl.message(
+      'Following',
+      name: 'feed_following',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<L10n> {

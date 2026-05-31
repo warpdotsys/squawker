@@ -58,6 +58,11 @@ const optionEnhancedSearches = 'enhanced_searches';
 const optionEnhancedProfile = 'enhanced_profile';
 const optionConfirmClose = 'confirm_close';
 
+const optionFeedMode = 'feed_mode';
+const optionFeedModeForYou = 'for_you';
+const optionFeedModeFollowing = 'following';
+const optionFeedModeSubscriptions = 'subscriptions';
+
 const optionTweetFontSize = 'tweet_font_size';
 
 const optionTwitterAccountTypes = 'twitter_account_types';

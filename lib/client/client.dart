@@ -1080,6 +1080,163 @@ class Twitter {
     return SearchStatus(items: users, cursorBottom: cursorBottom);
   }
 
+  // Home Timeline - For You (recommended/algorithmic)
+  static Future<TweetStatus> getHomeTimeline({String? cursor, int count = 20, RateFetchContext? fetchContext}) async {
+    try {
+      final variables = <String, dynamic>{
+        'count': count,
+        'includePromotedContent': true,
+        'requestContext': 'launch',
+        'withCommunity': true,
+      };
+
+      if (cursor != null) {
+        variables['cursor'] = cursor;
+      }
+
+      final uri = Uri.https('x.com', '/i/api/graphql/-M5P8LkjBRfeMF2MRJfbqA/HomeTimeline', {
+        'variables': jsonEncode(variables),
+        'features': jsonEncode(defaultFeatures),
+        'queryId': '-M5P8LkjBRfeMF2MRJfbqA',
+      });
+
+      final response = await (_twitterApi.client as _SquawkerTwitterClient).getWithRateFetchCtx(uri, fetchContext: fetchContext);
+      if (response.body.isEmpty) {
+        return TweetStatus(chains: [], cursorBottom: null, cursorTop: null);
+      }
+
+      var result = json.decode(response.body);
+      var instructions = List.from(result?['data']?['home']?['home_timeline_urt']?['instructions'] ?? []);
+      if (instructions.isEmpty) {
+        return TweetStatus(chains: [], cursorBottom: null, cursorTop: null);
+      }
+
+      return _parseHomeTimelineInstructions(instructions);
+    } catch (e) {
+      Logger.root.severe('Failed to get home timeline: $e');
+      rethrow;
+    }
+  }
+
+  // Home Latest Timeline - Following (chronological)
+  static Future<TweetStatus> getHomeLatestTimeline({String? cursor, int count = 20, RateFetchContext? fetchContext}) async {
+    try {
+      final variables = <String, dynamic>{
+        'count': count,
+        'enableRanking': false,
+        'includePromotedContent': true,
+        'requestContext': 'launch',
+        'withCommunity': true,
+      };
+
+      if (cursor != null) {
+        variables['cursor'] = cursor;
+      }
+
+      final uri = Uri.https('x.com', '/i/api/graphql/v8D8YuUcH9097nKOVvRPgA/HomeLatestTimeline', {
+        'variables': jsonEncode(variables),
+        'features': jsonEncode(defaultFeatures),
+        'queryId': 'v8D8YuUcH9097nKOVvRPgA',
+      });
+
+      final response = await (_twitterApi.client as _SquawkerTwitterClient).getWithRateFetchCtx(uri, fetchContext: fetchContext);
+      if (response.body.isEmpty) {
+        return TweetStatus(chains: [], cursorBottom: null, cursorTop: null);
+      }
+
+      var result = json.decode(response.body);
+      var instructions = List.from(result?['data']?['home']?['home_timeline_urt']?['instructions'] ?? []);
+      if (instructions.isEmpty) {
+        return TweetStatus(chains: [], cursorBottom: null, cursorTop: null);
+      }
+
+      return _parseHomeTimelineInstructions(instructions);
+    } catch (e) {
+      Logger.root.severe('Failed to get home latest timeline: $e');
+      rethrow;
+    }
+  }
+
+  // Parse home timeline instructions (shared between ForYou and Following)
+  static TweetStatus _parseHomeTimelineInstructions(List<dynamic> instructions) {
+    List<TweetChain> chains = [];
+    String? cursorBottom;
+    String? cursorTop;
+
+    for (var instruction in instructions) {
+      String type = instruction['__typename'] ?? instruction['type'] ?? '';
+
+      if (type == 'TimelineAddEntries' || type == 'TimelineAddToModule') {
+        List entries = List.from(instruction['entries'] ?? instruction['moduleItems'] ?? []);
+
+        for (var entry in entries) {
+          String entryId = entry['entryId'] ?? '';
+
+          if (entryId.startsWith('cursor-bottom')) {
+            cursorBottom = entry['content']?['value'] ?? entry['content']?['operation']?['cursor']?['value'];
+          } else if (entryId.startsWith('cursor-top')) {
+            cursorTop = entry['content']?['value'] ?? entry['content']?['operation']?['cursor']?['value'];
+          } else if (entryId.startsWith('tweet-')) {
+            var result = entry['content']?['itemContent']?['tweet_results']?['result'];
+            if (result != null) {
+              result = result['rest_id'] != null ? result : result['tweet'];
+              if (result != null && result['rest_id'] != null) {
+                try {
+                  TweetWithCard tc = TweetWithCard.fromGraphqlJson(result);
+                  chains.add(TweetChain(id: result['rest_id'], tweets: [tc], isPinned: false));
+                } catch (e) {
+                  Logger.root.warning('Failed to parse tweet: $e');
+                }
+              }
+            }
+          } else if (entryId.startsWith('homeConversation-') || entryId.contains('-conversation-')) {
+            List<TweetWithCard> tweets = [];
+            for (var item in List.from(entry['content']?['items'] ?? [])) {
+              var result = item['item']?['itemContent']?['tweet_results']?['result'];
+              if (result != null) {
+                result = result['rest_id'] != null ? result : result['tweet'];
+                if (result != null && result['rest_id'] != null) {
+                  try {
+                    TweetWithCard tc = TweetWithCard.fromGraphqlJson(result);
+                    tweets.add(tc);
+                  } catch (e) {
+                    Logger.root.warning('Failed to parse conversation tweet: $e');
+                  }
+                }
+              }
+            }
+            if (tweets.isNotEmpty) {
+              chains.add(TweetChain(id: tweets[0].conversationIdStr ?? tweets[0].idStr!, tweets: tweets, isPinned: false));
+            }
+          }
+        }
+      } else if (type == 'TimelinePinEntry') {
+        var result = instruction['entry']?['content']?['itemContent']?['tweet_results']?['result'];
+        if (result != null) {
+          result = result['rest_id'] != null ? result : result['tweet'];
+          if (result != null && result['rest_id'] != null) {
+            try {
+              TweetWithCard tc = TweetWithCard.fromGraphqlJson(result);
+              chains.add(TweetChain(id: result['rest_id'], tweets: [tc], isPinned: true));
+            } catch (e) {
+              Logger.root.warning('Failed to parse pinned tweet: $e');
+            }
+          }
+        }
+      }
+    }
+
+    // Sort by creation time (newest first)
+    chains.sort((a, b) {
+      var aCreatedAt = a.tweets[0].createdAt;
+      var bCreatedAt = b.tweets[0].createdAt;
+      if (aCreatedAt == null || bCreatedAt == null) return 0;
+      return bCreatedAt.compareTo(aCreatedAt);
+    });
+
+    return TweetStatus(chains: chains, cursorBottom: cursorBottom, cursorTop: cursorTop);
+  }
+
   static Future<List<TrendLocation>> getTrendLocations() async {
     var result = await _cache.getOrCreateAsJSON('trends.locations', const Duration(days: 2), () async {
       var locations = await _twitterApiAllowUnauthenticated.trendsService.available();

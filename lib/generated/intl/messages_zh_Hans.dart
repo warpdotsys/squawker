@@ -507,6 +507,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "tweet_font_size_label": MessageLookupByLibrary.simpleMessage("字体大小"),
     "tweet_deleted": MessageLookupByLibrary.simpleMessage("推文已删除"),
+    "feed_for_you": MessageLookupByLibrary.simpleMessage("为你推荐"),
+    "feed_following": MessageLookupByLibrary.simpleMessage("你关注的"),
     "tweets": MessageLookupByLibrary.simpleMessage("推文"),
     "tweets_and_replies": MessageLookupByLibrary.simpleMessage("推文和回复"),
     "tweets_number": m17,

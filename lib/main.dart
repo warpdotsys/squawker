@@ -220,6 +220,7 @@ Future<void> main() async {
     optionEnhancedFeeds: true,
     optionEnhancedSearches: true,
     optionEnhancedProfile: true,
+    optionFeedMode: optionFeedModeForYou,
     optionTwitterAccountTypes: twitterAccountTypesPriorityToRegular,
     optionUserTrendsLocations: jsonEncode({
       'active': {'name': 'Worldwide', 'woeid': 1},

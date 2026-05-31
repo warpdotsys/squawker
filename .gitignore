@@ -40,3 +40,8 @@ app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+
+# Dev config (sensitive)
+.dev-config.md
+PROJECT_CONTEXT.md
+AGENTS_CONTEXT.md

@@ -636,6 +636,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "tweet_font_size_label": MessageLookupByLibrary.simpleMessage("Font size"),
     "tweet_deleted": MessageLookupByLibrary.simpleMessage("Tweet deleted"),
+    "feed_for_you": MessageLookupByLibrary.simpleMessage("For You"),
+    "feed_following": MessageLookupByLibrary.simpleMessage("Following"),
     "tweets": MessageLookupByLibrary.simpleMessage("Tweets"),
     "tweets_and_replies": MessageLookupByLibrary.simpleMessage(
       "Tweets & Replies",
