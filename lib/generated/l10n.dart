@@ -3129,6 +3129,106 @@ class L10n {
       args: [],
     );
   }
+
+  /// `Follow`
+  String get follow {
+    return Intl.message(
+      'Follow',
+      name: 'follow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unfollow`
+  String get unfollow {
+    return Intl.message(
+      'Unfollow',
+      name: 'unfollow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tag`
+  String get tag {
+    return Intl.message(
+      'Tag',
+      name: 'tag',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Tag`
+  String get create_tag {
+    return Intl.message(
+      'Create Tag',
+      name: 'create_tag',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tag name`
+  String get tag_name {
+    return Intl.message(
+      'Tag name',
+      name: 'tag_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to Tag`
+  String get add_to_tag {
+    return Intl.message(
+      'Add to Tag',
+      name: 'add_to_tag',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import Following`
+  String get import_following {
+    return Intl.message(
+      'Import Following',
+      name: 'import_following',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `History`
+  String get history {
+    return Intl.message(
+      'History',
+      name: 'history',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Viewed`
+  String get viewed {
+    return Intl.message(
+      'Viewed',
+      name: 'viewed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Opened`
+  String get opened {
+    return Intl.message(
+      'Opened',
+      name: 'opened',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<L10n> {

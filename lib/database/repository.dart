@@ -24,6 +24,7 @@ const String tableTwitterToken = 'twitter_token';
 const String tableTwitterProfile = 'twitter_profile';
 
 const String tableAccounts = 'accounts';
+const String tableTweetHistory = 'tweet_history';
 
 class Repository {
   static final log = Logger('Repository');
@@ -326,10 +327,14 @@ class Repository {
         // create table for storing twitter accounts
         SqlMigration('CREATE TABLE IF NOT EXISTS $tableAccounts (id TEXT PRIMARY KEY, screen_name TEXT, auth_header VARCHAR)'),
       ],
+      32: [
+        // create table for tweet history (viewed/opened)
+        SqlMigration('CREATE TABLE IF NOT EXISTS $tableTweetHistory (tweet_id TEXT PRIMARY KEY, viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, opened BOOLEAN DEFAULT 0, user_id TEXT, screen_name TEXT)'),
+      ],
     });
     await openDatabase(
       databaseName,
-      version: 31,
+      version: 32,
       onUpgrade: myMigrationPlan,
       onCreate: myMigrationPlan,
       onDowngrade: myMigrationPlan,
