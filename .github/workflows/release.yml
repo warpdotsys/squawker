@@ -98,7 +98,7 @@ jobs:
             build_app/outputs/release/*.txt
 
       - name: Publish the release
-        uses: eregon/publish-release@v2
+        uses: eregon/publish-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
