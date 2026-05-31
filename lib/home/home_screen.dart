@@ -286,6 +286,8 @@ class ScaffoldWithBottomNavigationState extends State<ScaffoldWithBottomNavigati
   bool _goToSubscriptions = false;
   int _selectedIndex = 0;
 
+  int get selectedIndex => _selectedIndex;
+
   @override
   void initState() {
     super.initState();
@@ -305,6 +307,18 @@ class ScaffoldWithBottomNavigationState extends State<ScaffoldWithBottomNavigati
       setState(() {
         _goToSubscriptions = true;
       });
+    }
+  }
+
+  void switchToPage(String pageId) {
+    int idx = widget.pages.indexWhere((e) => e.id == pageId);
+    if (idx >= 0 && idx != _selectedIndex) {
+      bool navigationAnimations = PrefService.of(context, listen: false).get(optionNavigationAnimations);
+      if (navigationAnimations) {
+        _pageController?.animateToPage(idx, duration: const Duration(milliseconds: 200), curve: Curves.linear);
+      } else {
+        _pageController?.jumpToPage(idx);
+      }
     }
   }
 

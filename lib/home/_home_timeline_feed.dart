@@ -140,6 +140,44 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
     _checkFetchData();
   }
 
+  // Silent refresh: fetch new data at top without moving current position
+  Future<void> silentRefresh() async {
+    try {
+      RateFetchContext fetchContext = RateFetchContext(
+        widget.type == HomeTimelineType.forYou
+            ? '/i/api/graphql/-M5P8LkjBRfeMF2MRJfbqA/HomeTimeline'
+            : '/i/api/graphql/v8D8YuUcH9097nKOVvRPgA/HomeLatestTimeline',
+        1,
+      );
+
+      TweetStatus result;
+      if (widget.type == HomeTimelineType.forYou) {
+        result = await Twitter.getHomeTimeline(count: 20, fetchContext: fetchContext);
+      } else {
+        result = await Twitter.getHomeLatestTimeline(count: 20, fetchContext: fetchContext);
+      }
+
+      if (!mounted || result.chains.isEmpty) return;
+
+      // Insert new tweets at the beginning without moving scroll position
+      setState(() {
+        for (var chain in result.chains.reversed) {
+          if (!_data.any((e) => e.id == chain.id)) {
+            _data.insert(0, chain);
+          }
+        }
+        _isLoading = false;
+      });
+
+      // Update cursor
+      if (result.cursorBottom != null) {
+        _cursorBottom = result.cursorBottom;
+      }
+    } catch (e) {
+      log.warning('Silent refresh failed: $e');
+    }
+  }
+
   void setLoading() {
     setState(() {
       _isLoading = true;
