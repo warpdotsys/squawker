@@ -989,7 +989,15 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
                           ),
                     ),
                     content,
-                    media,
+                    // Media with tappable border for opening tweet
+                    GestureDetector(
+                      onTap: () => onClickOpenTweet(tweet),
+                      behavior: HitTestBehavior.translucent,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: media,
+                      ),
+                    ),
                     quotedTweet,
                     TweetCard(tweet: tweet, card: tweet.card),
                     birdwatchQuoted,

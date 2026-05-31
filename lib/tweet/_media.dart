@@ -158,25 +158,28 @@ class _TweetMediaState extends State<TweetMedia> {
 
       return Container(
         margin: const EdgeInsets.only(top: 8, left: 16, right: 16),
-        child: AspectRatio(
-          aspectRatio: largestAspectRatio,
-          child: PageView.builder(
-            controller: _controller,
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.media.length,
-            itemBuilder: (context, index) {
-              var item = widget.media[index];
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: AspectRatio(
+            aspectRatio: largestAspectRatio,
+            child: PageView.builder(
+              controller: _controller,
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.media.length,
+              itemBuilder: (context, index) {
+                var item = widget.media[index];
 
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            TweetMediaView(initialIndex: index, media: widget.media, username: widget.username))),
-                child: _TweetMediaItem(
-                    media: item, index: index + 1, total: widget.media.length, username: widget.username),
-              );
-            },
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              TweetMediaView(initialIndex: index, media: widget.media, username: widget.username))),
+                  child: _TweetMediaItem(
+                      media: item, index: index + 1, total: widget.media.length, username: widget.username),
+                );
+              },
+            ),
           ),
         ),
       );

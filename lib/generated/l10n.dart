@@ -3229,6 +3229,126 @@ class L10n {
       args: [],
     );
   }
+
+  /// `Compose`
+  String get compose_tweet {
+    return Intl.message(
+      'Compose',
+      name: 'compose_tweet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reply Settings`
+  String get reply_settings {
+    return Intl.message(
+      'Reply Settings',
+      name: 'reply_settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Everyone can reply`
+  String get everyone_can_reply {
+    return Intl.message(
+      'Everyone can reply',
+      name: 'everyone_can_reply',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only mentioned`
+  String get mentioned_only {
+    return Intl.message(
+      'Only mentioned',
+      name: 'mentioned_only',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only verified`
+  String get verified_only {
+    return Intl.message(
+      'Only verified',
+      name: 'verified_only',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Poll`
+  String get add_poll {
+    return Intl.message(
+      'Add Poll',
+      name: 'add_poll',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Media`
+  String get add_media {
+    return Intl.message(
+      'Add Media',
+      name: 'add_media',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `AI Generated`
+  String get ai_generated {
+    return Intl.message(
+      'AI Generated',
+      name: 'ai_generated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paid Promotion`
+  String get paid_promotion {
+    return Intl.message(
+      'Paid Promotion',
+      name: 'paid_promotion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Schedule`
+  String get schedule {
+    return Intl.message(
+      'Schedule',
+      name: 'schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drafts`
+  String get drafts {
+    return Intl.message(
+      'Drafts',
+      name: 'drafts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scheduled`
+  String get scheduled {
+    return Intl.message(
+      'Scheduled',
+      name: 'scheduled',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<L10n> {
