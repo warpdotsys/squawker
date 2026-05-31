@@ -94,10 +94,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "add_account": MessageLookupByLibrary.simpleMessage("Add an account"),
     "add_account_title": MessageLookupByLibrary.simpleMessage("Add an account"),
     "add_subscriptions": MessageLookupByLibrary.simpleMessage(
-      "Add subscriptions",
+      "Add Following",
     ),
     "add_to_feed": MessageLookupByLibrary.simpleMessage("Add to feed"),
-    "add_to_group": MessageLookupByLibrary.simpleMessage("Add to group"),
+    "add_to_group": MessageLookupByLibrary.simpleMessage("Add to Tag"),
     "all": MessageLookupByLibrary.simpleMessage("All"),
     "all_the_great_software_used_by_fritter":
         MessageLookupByLibrary.simpleMessage(
@@ -316,7 +316,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "general": MessageLookupByLibrary.simpleMessage("General"),
     "generic_username": MessageLookupByLibrary.simpleMessage("User"),
     "group_name": m6,
-    "groups": MessageLookupByLibrary.simpleMessage("Groups"),
+    "groups": MessageLookupByLibrary.simpleMessage("Tags"),
     "help_make_fritter_even_better": MessageLookupByLibrary.simpleMessage(
       "Help make Squawker even better",
     ),
@@ -339,7 +339,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Import from Twitter/X",
     ),
     "import_subscriptions": MessageLookupByLibrary.simpleMessage(
-      "Import subscriptions",
+      "Import Following",
     ),
     "imported_snapshot_data_users_so_far": m7,
     "include_replies": MessageLookupByLibrary.simpleMessage("Include replies"),
@@ -563,8 +563,8 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Sorry, the replied tweet could not be found!",
         ),
-    "subscribe": MessageLookupByLibrary.simpleMessage("Subscribe"),
-    "subscriptions": MessageLookupByLibrary.simpleMessage("Subscriptions"),
+    "subscribe": MessageLookupByLibrary.simpleMessage("Follow"),
+    "subscriptions": MessageLookupByLibrary.simpleMessage("Following"),
     "subtitles": MessageLookupByLibrary.simpleMessage("Subtitles"),
     "successfully_saved_the_media": MessageLookupByLibrary.simpleMessage(
       "Saved the media!",
@@ -591,7 +591,7 @@ class MessageLookup extends MessageLookupByLibrary {
         ),
     "this_group_contains_no_subscriptions":
         MessageLookupByLibrary.simpleMessage(
-          "This group contains no subscriptions!",
+          "No users in this Tag!",
         ),
     "this_took_too_long_to_load_please_check_your_network_connection":
         MessageLookupByLibrary.simpleMessage(
@@ -737,7 +737,7 @@ class MessageLookup extends MessageLookupByLibrary {
           "Unable to load the tweets for the feed",
         ),
     "unable_to_refresh_the_subscriptions": MessageLookupByLibrary.simpleMessage(
-      "Unable to refresh the subscriptions",
+      "Unable to refresh following list",
     ),
     "unable_to_run_the_database_migrations":
         MessageLookupByLibrary.simpleMessage(
@@ -751,7 +751,7 @@ class MessageLookup extends MessageLookupByLibrary {
         ),
     "unknown": MessageLookupByLibrary.simpleMessage("Unknown"),
     "unsave": MessageLookupByLibrary.simpleMessage("Unsave"),
-    "unsubscribe": MessageLookupByLibrary.simpleMessage("Unsubscribe"),
+    "unsubscribe": MessageLookupByLibrary.simpleMessage("Unfollow"),
     "unsupported_url": MessageLookupByLibrary.simpleMessage("Unsupported URL"),
     "update_to_release_version_through_your_fdroid_client": m20,
     "updates": MessageLookupByLibrary.simpleMessage("Updates"),

@@ -80,9 +80,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "action_failed": MessageLookupByLibrary.simpleMessage("操作失败"),
     "add_account": MessageLookupByLibrary.simpleMessage("添加账户"),
     "add_account_title": MessageLookupByLibrary.simpleMessage("添加账户"),
-    "add_subscriptions": MessageLookupByLibrary.simpleMessage("添加订阅"),
+    "add_subscriptions": MessageLookupByLibrary.simpleMessage("添加关注"),
     "add_to_feed": MessageLookupByLibrary.simpleMessage("加入时间轴"),
-    "add_to_group": MessageLookupByLibrary.simpleMessage("添加到订阅组"),
+    "add_to_group": MessageLookupByLibrary.simpleMessage("添加到标签"),
     "all": MessageLookupByLibrary.simpleMessage("全部"),
     "all_the_great_software_used_by_fritter":
         MessageLookupByLibrary.simpleMessage("Squawker 所使用的伟大项目😇"),
@@ -253,7 +253,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "general": MessageLookupByLibrary.simpleMessage("通用"),
     "generic_username": MessageLookupByLibrary.simpleMessage("用户"),
     "group_name": m6,
-    "groups": MessageLookupByLibrary.simpleMessage("订阅组"),
+    "groups": MessageLookupByLibrary.simpleMessage("标签"),
     "help_make_fritter_even_better": MessageLookupByLibrary.simpleMessage(
       "一起改进 Squawker，让它变得更好😉",
     ),
@@ -271,7 +271,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "import_from_twitter": MessageLookupByLibrary.simpleMessage(
       "从 Twitter/X 导入",
     ),
-    "import_subscriptions": MessageLookupByLibrary.simpleMessage("导入订阅"),
+    "import_subscriptions": MessageLookupByLibrary.simpleMessage("导入关注"),
     "imported_snapshot_data_users_so_far": m7,
     "include_replies": MessageLookupByLibrary.simpleMessage("包括回复"),
     "include_retweets": MessageLookupByLibrary.simpleMessage("包括转推"),
@@ -448,8 +448,8 @@ class MessageLookup extends MessageLookupByLibrary {
         ),
     "sorry_the_replied_tweet_could_not_be_found":
         MessageLookupByLibrary.simpleMessage("对不起，无法找到回复的推文！"),
-    "subscribe": MessageLookupByLibrary.simpleMessage("订阅"),
-    "subscriptions": MessageLookupByLibrary.simpleMessage("订阅"),
+    "subscribe": MessageLookupByLibrary.simpleMessage("关注"),
+    "subscriptions": MessageLookupByLibrary.simpleMessage("关注"),
     "subtitles": MessageLookupByLibrary.simpleMessage("字幕"),
     "successfully_saved_the_media": MessageLookupByLibrary.simpleMessage(
       "已保存媒体文件！",
@@ -471,7 +471,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "there_were_no_trends_returned_this_is_unexpected_please_report_as_a_bug_if_possible":
         MessageLookupByLibrary.simpleMessage("没有返回的趋势。这是出乎意料的！如果可能，请反馈错误。"),
     "this_group_contains_no_subscriptions":
-        MessageLookupByLibrary.simpleMessage("该组不包含任何订阅！"),
+        MessageLookupByLibrary.simpleMessage("该标签下没有关注的用户！"),
     "this_took_too_long_to_load_please_check_your_network_connection":
         MessageLookupByLibrary.simpleMessage("加载时间太长了。 检查您的网络连接！"),
     "this_tweet_is_unavailable": MessageLookupByLibrary.simpleMessage(
@@ -586,7 +586,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "unable_to_load_the_tweets_for_the_feed":
         MessageLookupByLibrary.simpleMessage("无法载入最新推文"),
     "unable_to_refresh_the_subscriptions": MessageLookupByLibrary.simpleMessage(
-      "无法刷新订阅",
+      "无法刷新关注列表",
     ),
     "unable_to_run_the_database_migrations":
         MessageLookupByLibrary.simpleMessage("无法进行数据迁移"),
@@ -596,7 +596,7 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage("无法传输趋势位置首选项"),
     "unknown": MessageLookupByLibrary.simpleMessage("未知"),
     "unsave": MessageLookupByLibrary.simpleMessage("取消保存"),
-    "unsubscribe": MessageLookupByLibrary.simpleMessage("取消订阅"),
+    "unsubscribe": MessageLookupByLibrary.simpleMessage("取消关注"),
     "unsupported_url": MessageLookupByLibrary.simpleMessage("不受支持的 URL"),
     "update_to_release_version_through_your_fdroid_client": m20,
     "updates": MessageLookupByLibrary.simpleMessage("更新"),
