@@ -97,9 +97,21 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
   }
 
   Future<void> _checkFetchData() async {
-    if (_data.isEmpty || (_data.length > _lastData.length && (_data.length - _itemPositionsListener.itemPositions.value.first.index) < 20)) {
+    if (_isLoading) return;
+
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    final lastIndex = positions.last.index;
+    final shouldLoad = _data.isEmpty || (lastIndex >= _data.length - 5);
+
+    if (shouldLoad) {
       await _lock.synchronized(() async {
-        if (_data.isEmpty || (_data.length > _lastData.length && (_data.length - _itemPositionsListener.itemPositions.value.first.index) < 20)) {
+        // Re-check after acquiring lock
+        final positions2 = _itemPositionsListener.itemPositions.value;
+        if (positions2.isEmpty) return;
+        final lastIndex2 = positions2.last.index;
+        if (_data.isEmpty || (lastIndex2 >= _data.length - 5)) {
           _lastData.clear();
           _lastData.addAll(_data);
           await _listTweets();

@@ -8,6 +8,7 @@ import 'package:squawker/settings/_about.dart';
 import 'package:squawker/settings/_account.dart';
 import 'package:squawker/settings/_data.dart';
 import 'package:squawker/settings/_general.dart';
+import 'package:squawker/settings/_history.dart';
 import 'package:squawker/settings/_home.dart';
 import 'package:squawker/settings/_theme.dart';
 import 'package:squawker/download/download_settings.dart';
@@ -108,6 +109,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               navigationAnimationsEnabled
                 ? MaterialPageRoute(builder: (context) => const DownloadSettingsPage())
                 : PageRouteBuilder(pageBuilder: (context, anim1, anim2) => const DownloadSettingsPage()),
+            ),
+          ),
+          ListTile(
+            title: Text(L10n.of(context).history),
+            leading: const Icon(Symbols.history),
+            onTap: () => Navigator.push(
+              context,
+              navigationAnimationsEnabled
+                ? MaterialPageRoute(builder: (context) => const HistoryScreen())
+                : PageRouteBuilder(pageBuilder: (context, anim1, anim2) => const HistoryScreen()),
             ),
           ),
           ListTile(

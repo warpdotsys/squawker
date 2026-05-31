@@ -27,6 +27,7 @@ import 'package:squawker/utils/iterables.dart';
 import 'package:squawker/utils/misc.dart';
 import 'package:squawker/utils/route_util.dart';
 import 'package:squawker/utils/translation.dart';
+import 'package:squawker/utils/tweet_history_service.dart';
 import 'package:squawker/utils/urls.dart';
 import 'package:squawker/download/download_button.dart';
 import 'package:squawker/download/download_service.dart';
@@ -216,6 +217,7 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
   }
 
   void onClickOpenTweet(TweetWithCard tweet) {
+    TweetHistoryService.markOpened(tweet.idStr!, userId: tweet.user?.idStr, screenName: tweet.user?.screenName);
     pushNamedRoute(context, routeStatus, StatusScreenArguments(id: tweet.idStr!, username: tweet.user!.screenName!));
   }
 
@@ -720,6 +722,8 @@ class TweetTileState extends State<TweetTile> with SingleTickerProviderStateMixi
           if (widget.visiblePositionState != null) {
             widget.visiblePositionState!.positionChanged(widget.conversationId, this.tweet.idStr, widget.tweetIdx);
           }
+          // Mark as viewed when visible
+          TweetHistoryService.markViewed(tweet.idStr!, userId: tweet.user?.idStr, screenName: tweet.user?.screenName);
         }
       },
       child: Consumer<ImportDataModel>(

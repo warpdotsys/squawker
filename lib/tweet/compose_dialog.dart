@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:squawker/client/client.dart';
@@ -8,6 +11,15 @@ enum ReplyControlMode {
   following,
   mentioned,
   verified,
+}
+
+class _MediaItem {
+  final File file;
+  final String type; // 'image' or 'video'
+  String? mediaId;
+  List<String> taggedUsers = [];
+
+  _MediaItem({required this.file, required this.type});
 }
 
 class ComposeDialog extends StatefulWidget {
@@ -36,7 +48,10 @@ class _ComposeDialogState extends State<ComposeDialog> {
     TextEditingController(),
     TextEditingController(),
   ];
-  int _pollDuration = 1440; // 24 hours in minutes
+  int _pollDuration = 1440;
+  final List<_MediaItem> _mediaItems = [];
+  bool _isUploading = false;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -45,6 +60,98 @@ class _ComposeDialogState extends State<ComposeDialog> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _pickMedia() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.media,
+      allowMultiple: true,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        for (var file in result.files) {
+          if (file.path != null) {
+            final ext = file.extension?.toLowerCase() ?? '';
+            final isVideo = ['mp4', 'mov', 'avi', 'mkv'].contains(ext);
+            _mediaItems.add(_MediaItem(
+              file: File(file.path!),
+              type: isVideo ? 'video' : 'image',
+            ));
+          }
+        }
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _uploadMedia() async {
+    final mediaEntities = <Map<String, dynamic>>[];
+
+    for (var item in _mediaItems) {
+      setState(() => _isUploading = true);
+
+      final bytes = await item.file.readAsBytes();
+      final mediaType = item.type == 'video' ? 'video/mp4' : 'image/${item.file.path.split('.').last}';
+
+      // INIT
+      String? mediaId;
+      if (item.type == 'video') {
+        mediaId = await Twitter.mediaInit(
+          bytes.length,
+          mediaType,
+          mediaCategory: 'tweet_video',
+        );
+      } else {
+        mediaId = await Twitter.mediaInit(
+          bytes.length,
+          mediaType,
+          mediaCategory: 'tweet_image',
+        );
+      }
+
+      if (mediaId == null) continue;
+
+      // APPEND (upload in 4MB chunks)
+      const chunkSize = 4 * 1024 * 1024;
+      int segmentIndex = 0;
+      for (int offset = 0; offset < bytes.length; offset += chunkSize) {
+        final end = (offset + chunkSize).clamp(0, bytes.length);
+        final chunk = bytes.sublist(offset, end);
+        final ok = await Twitter.mediaAppend(mediaId, chunk, segmentIndex);
+        if (!ok) break;
+        segmentIndex++;
+      }
+
+      // FINALIZE
+      final result = await Twitter.mediaFinalize(mediaId);
+      if (result != null) {
+        item.mediaId = mediaId;
+
+        // For video, wait for processing
+        if (item.type == 'video') {
+          for (int i = 0; i < 30; i++) {
+            await Future.delayed(const Duration(seconds: 2));
+            final status = await Twitter.mediaStatus(mediaId);
+            if (status?['processing_info']?['state'] == 'succeeded') break;
+            if (status?['processing_info']?['state'] == 'failed') {
+              mediaId = null;
+              break;
+            }
+          }
+        }
+
+        if (mediaId != null) {
+          mediaEntities.add({
+            'media_id': mediaId,
+            'tagged_users': item.taggedUsers,
+          });
+        }
+      }
+
+      setState(() => _isUploading = false);
+    }
+
+    return mediaEntities;
   }
 
   Map<String, dynamic>? _buildConversationControl() {
@@ -88,10 +195,6 @@ class _ComposeDialogState extends State<ComposeDialog> {
       'cards_locale': 'en',
       'poll_options': options,
       'poll_duration_minutes': _pollDuration,
-      'poll_end_date_utc': DateTime.now()
-          .add(Duration(minutes: _pollDuration))
-          .toUtc()
-          .toIso8601String(),
     };
   }
 
@@ -196,8 +299,10 @@ class _ComposeDialogState extends State<ComposeDialog> {
                 : l10n.compose_tweet),
             actions: [
               FilledButton(
-                onPressed: _submit,
-                child: Text(isReply ? l10n.reply : l10n.compose_tweet),
+                onPressed: _isSubmitting ? null : _submit,
+                child: _isSubmitting
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : Text(isReply ? l10n.reply : l10n.compose_tweet),
               ),
               const SizedBox(width: 8),
             ],
@@ -219,6 +324,71 @@ class _ComposeDialogState extends State<ComposeDialog> {
                   ),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+
+                // Media preview
+                if (_mediaItems.isNotEmpty) ...[
+                  const Divider(),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _mediaItems.length,
+                      itemBuilder: (ctx, i) {
+                        final item = _mediaItems[i];
+                        return Stack(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey[300],
+                              ),
+                              child: item.type == 'image'
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(item.file, fit: BoxFit.cover),
+                                    )
+                                  : const Center(child: Icon(Symbols.videocam, size: 32)),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 12,
+                              child: GestureDetector(
+                                onTap: () => setState(() => _mediaItems.removeAt(i)),
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black54,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Symbols.close, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            // Tag users button
+                            Positioned(
+                              bottom: 4,
+                              right: 12,
+                              child: GestureDetector(
+                                onTap: () => _showTagUsersDialog(i),
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black54,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Symbols.person_add, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
 
                 const Divider(),
 
@@ -330,13 +500,18 @@ class _ComposeDialogState extends State<ComposeDialog> {
                   spacing: 4,
                   children: [
                     ActionChip(
+                      avatar: const Icon(Symbols.image, size: 18),
+                      label: Text(l10n.add_media),
+                      onPressed: _pickMedia,
+                    ),
+                    ActionChip(
                       avatar: const Icon(Symbols.add_chart, size: 18),
                       label: Text(l10n.add_poll),
                       onPressed: () => setState(() => _showPoll = !_showPoll),
                     ),
                     ActionChip(
                       avatar: Icon(
-                        _isAiGenerated ? Symbols.smart_toy : Symbols.smart_toy,
+                        Symbols.smart_toy,
                         size: 18,
                         color: _isAiGenerated
                             ? Theme.of(context).colorScheme.primary
@@ -368,38 +543,86 @@ class _ComposeDialogState extends State<ComposeDialog> {
     );
   }
 
+  void _showTagUsersDialog(int mediaIndex) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('标记用户'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: '输入用户名（逗号分隔）',
+            prefixText: '@',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          ElevatedButton(
+            onPressed: () {
+              final users = controller.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+              setState(() {
+                _mediaItems[mediaIndex].taggedUsers = users;
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     final text = _textController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _mediaItems.isEmpty) return;
+
+    setState(() => _isSubmitting = true);
 
     final scaffold = ScaffoldMessenger.of(context);
     final l10n = L10n.of(context);
     Navigator.pop(context);
 
-    final result = await Twitter.createTweet(
-      text: text,
-      replyToTweetId: widget.replyToTweetId,
-      conversationControl: _buildConversationControl(),
-      contentDisclosure: _buildContentDisclosure(),
-      poll: _buildPoll(),
-    );
+    try {
+      // Upload media first
+      List<Map<String, dynamic>> mediaEntities = [];
+      if (_mediaItems.isNotEmpty) {
+        mediaEntities = await _uploadMedia();
+      }
 
-    if (result != null &&
-        result['data']?['create_tweet']?['tweet_results']?['result']
-                ?['rest_id'] !=
-            null) {
-      scaffold.showSnackBar(
-        SnackBar(
-          content: Text(widget.replyToTweetId != null
-              ? l10n.reply_sent
-              : '推文已发布'),
-          backgroundColor: Colors.green,
-        ),
+      final result = await Twitter.createTweet(
+        text: text,
+        replyToTweetId: widget.replyToTweetId,
+        mediaEntities: mediaEntities,
+        conversationControl: _buildConversationControl(),
+        contentDisclosure: _buildContentDisclosure(),
+        poll: _buildPoll(),
       );
-    } else {
+
+      if (result != null &&
+          result['data']?['create_tweet']?['tweet_results']?['result']
+                  ?['rest_id'] !=
+              null) {
+        scaffold.showSnackBar(
+          SnackBar(
+            content: Text(widget.replyToTweetId != null
+                ? l10n.reply_sent
+                : '推文已发布'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        scaffold.showSnackBar(
+          SnackBar(
+            content: Text(l10n.action_failed),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       scaffold.showSnackBar(
         SnackBar(
-          content: Text(l10n.action_failed),
+          content: Text('${l10n.action_failed}: $e'),
           backgroundColor: Colors.red,
         ),
       );
