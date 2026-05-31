@@ -56,7 +56,7 @@ Future checkForUpdates() async {
   final client = HttpClient();
   client.userAgent = faker.internet.userAgent();
 
-  final request = await client.getUrl(Uri.parse("https://api.github.com/repos/j-fbriere/squawker/releases/latest"));
+  final request = await client.getUrl(Uri.parse("https://api.github.com/repos/warpdotsys/squawker/releases/latest"));
   final response = await request.close();
 
   if (response.statusCode == 200) {

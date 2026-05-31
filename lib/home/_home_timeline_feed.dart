@@ -40,7 +40,7 @@ class HomeTimelineFeed extends StatefulWidget {
   State<HomeTimelineFeed> createState() => HomeTimelineFeedState();
 }
 
-class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingObserver {
+class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<HomeTimelineFeed> {
   static final log = Logger('HomeTimelineFeedState');
   static final Lock _lock = Lock();
 
@@ -59,7 +59,11 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
   OverlayEntry? _overlayEntry;
   final Map<String, int> _tweetIdxDic = {};
   bool _isLoading = true;
+  bool _initialLoadDone = false;
   String? _cursorBottom;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -72,7 +76,9 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
       _checkFetchData();
     });
     Future.delayed(Duration.zero, () {
-      _checkFetchData();
+      if (!_initialLoadDone) {
+        _checkFetchData();
+      }
     });
   }
 
@@ -269,6 +275,7 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
       setState(() {
         _data.addAll(threads);
         _isLoading = false;
+        _initialLoadDone = true;
       });
 
       _tweetIdxDic.clear();
@@ -332,6 +339,7 @@ class HomeTimelineFeedState extends State<HomeTimelineFeed> with WidgetsBindingO
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     TwitterAccount.setCurrentContext(context);
     BasePrefService prefs = PrefService.of(context, listen: false);
     _keepFeedOffset = prefs.get(optionKeepFeedOffset);

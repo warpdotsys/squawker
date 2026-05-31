@@ -786,6 +786,111 @@ class Twitter {
     }
   }
 
+  // Media upload - INIT
+  static Future<String?> mediaInit(int totalBytes, String mediaType, {String? mediaCategory, int? videoDurationMs}) async {
+    try {
+      final params = <String, String>{
+        'command': 'INIT',
+        'total_bytes': totalBytes.toString(),
+        'media_type': mediaType,
+      };
+      if (mediaCategory != null) params['media_category'] = mediaCategory;
+      if (videoDurationMs != null) params['video_duration_ms'] = videoDurationMs.toString();
+
+      final uri = Uri.https('upload.x.com', '/i/media/upload.json', params);
+      final response = await _twitterApi.client.post(uri,
+        headers: {'content-type': 'application/octet-stream'},
+        body: '',
+      );
+
+      final result = jsonDecode(response.body);
+      return result['media_id_string'];
+    } catch (e) {
+      Logger.root.severe('Failed to init media upload: $e');
+      return null;
+    }
+  }
+
+  // Media upload - APPEND
+  static Future<bool> mediaAppend(String mediaId, List<int> data, int segmentIndex) async {
+    try {
+      final uri = Uri.https('upload.x.com', '/i/media/upload.json', {
+        'command': 'APPEND',
+        'media_id': mediaId,
+        'segment_index': segmentIndex.toString(),
+      });
+
+      final response = await _twitterApi.client.post(uri,
+        headers: {'content-type': 'application/octet-stream'},
+        body: data,
+      );
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      Logger.root.severe('Failed to append media chunk: $e');
+      return false;
+    }
+  }
+
+  // Media upload - FINALIZE
+  static Future<Map<String, dynamic>?> mediaFinalize(String mediaId, {bool allowAsync = true}) async {
+    try {
+      final params = <String, String>{
+        'command': 'FINALIZE',
+        'media_id': mediaId,
+      };
+      if (allowAsync) params['allow_async'] = 'true';
+
+      final uri = Uri.https('upload.x.com', '/i/media/upload.json', params);
+      final response = await _twitterApi.client.post(uri,
+        headers: {'content-type': 'application/octet-stream'},
+        body: '',
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      Logger.root.severe('Failed to finalize media upload: $e');
+      return null;
+    }
+  }
+
+  // Media upload - STATUS
+  static Future<Map<String, dynamic>?> mediaStatus(String mediaId) async {
+    try {
+      final uri = Uri.https('upload.x.com', '/i/media/upload.json', {
+        'command': 'STATUS',
+        'media_id': mediaId,
+      });
+
+      final response = await _twitterApi.client.get(uri);
+      return jsonDecode(response.body);
+    } catch (e) {
+      Logger.root.severe('Failed to get media status: $e');
+      return null;
+    }
+  }
+
+  // Tag users in media
+  static Future<bool> mediaTagUsers(String mediaId, List<String> userIds) async {
+    try {
+      final uri = Uri.https('upload.x.com', '/1.1/media/metadata/create.json');
+      final body = jsonEncode({
+        'media_id': mediaId,
+        'tagged_user_ids': userIds,
+      });
+
+      final response = await _twitterApi.client.post(uri,
+        headers: {'content-type': 'application/json'},
+        body: body,
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      Logger.root.severe('Failed to tag users in media: $e');
+      return false;
+    }
+  }
+
   static List<TweetChain> createTweetChains(List<dynamic> addEntries) {
     List<TweetChain> replies = [];
 

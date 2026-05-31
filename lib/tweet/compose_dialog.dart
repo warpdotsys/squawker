@@ -5,7 +5,7 @@ import 'package:squawker/generated/l10n.dart';
 
 enum ReplyControlMode {
   everyone,
-  community,
+  following,
   mentioned,
   verified,
 }
@@ -51,8 +51,8 @@ class _ComposeDialogState extends State<ComposeDialog> {
     switch (_replyControl) {
       case ReplyControlMode.everyone:
         return null;
-      case ReplyControlMode.community:
-        return {'mode': 'Community'};
+      case ReplyControlMode.following:
+        return {'mode': 'ByInvitation'};
       case ReplyControlMode.mentioned:
         return {'mode': 'ByInvitation'};
       case ReplyControlMode.verified:
@@ -99,8 +99,8 @@ class _ComposeDialogState extends State<ComposeDialog> {
     switch (_replyControl) {
       case ReplyControlMode.everyone:
         return L10n.of(context).everyone_can_reply;
-      case ReplyControlMode.community:
-        return '社区可回复';
+      case ReplyControlMode.following:
+        return '我关注的人可回复';
       case ReplyControlMode.mentioned:
         return L10n.of(context).mentioned_only;
       case ReplyControlMode.verified:
@@ -112,8 +112,8 @@ class _ComposeDialogState extends State<ComposeDialog> {
     switch (_replyControl) {
       case ReplyControlMode.everyone:
         return Symbols.public;
-      case ReplyControlMode.community:
-        return Symbols.group;
+      case ReplyControlMode.following:
+        return Symbols.people;
       case ReplyControlMode.mentioned:
         return Symbols.alternate_email;
       case ReplyControlMode.verified:
@@ -144,11 +144,11 @@ class _ComposeDialogState extends State<ComposeDialog> {
               },
             ),
             ListTile(
-              leading: const Icon(Symbols.group),
-              title: const Text('社区可回复'),
-              selected: _replyControl == ReplyControlMode.community,
+              leading: const Icon(Symbols.people),
+              title: const Text('我关注的人可回复'),
+              selected: _replyControl == ReplyControlMode.following,
               onTap: () {
-                setState(() => _replyControl = ReplyControlMode.community);
+                setState(() => _replyControl = ReplyControlMode.following);
                 Navigator.pop(ctx);
               },
             ),
